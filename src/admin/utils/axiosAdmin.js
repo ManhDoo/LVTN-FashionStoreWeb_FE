@@ -15,5 +15,22 @@ axiosAdmin.interceptors.request.use(
   },
   (error) => Promise.reject(error)
 );
+axiosAdmin.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response && error.response.status === 401) {
+      // Token hết hạn hoặc không hợp lệ
+      localStorage.removeItem('tokenAdmin');
+
+      // Chuyển hướng đến trang đăng nhập admin
+      window.location.href = '/admin';
+
+      // Optional: thông báo
+      alert('Phiên đăng nhập admin đã hết hạn. Vui lòng đăng nhập lại.');
+    }
+    return Promise.reject(error);
+  }
+);
+
 
 export default axiosAdmin;

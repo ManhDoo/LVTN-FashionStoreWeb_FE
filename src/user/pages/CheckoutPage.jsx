@@ -100,8 +100,7 @@ const CheckoutPage = () => {
   const handleDeliveryOptionChange = (option) => {
     setDeliveryOption(option);
 
-    if (option === "other") {
-      setEmail("");
+    if (option === "other" && isAuthenticated && user) {
       setName("");
       setAddress("");
       setPhone("");
@@ -136,6 +135,7 @@ const CheckoutPage = () => {
 
     try {
       const orderData = {
+        user: isAuthenticated ? user : null,
         name,
         phone,
         email,
@@ -145,7 +145,6 @@ const CheckoutPage = () => {
         wardName,
         cart,
         pttt: paymentMethod,
-        user: isAuthenticated ? user : null,
       };
 
       const response = await placeOrder(orderData);
@@ -159,8 +158,8 @@ const CheckoutPage = () => {
       } else {
         // Xử lý các phương thức thanh toán khác (như COD)
         alert("Đơn hàng đã được đặt thành công!");
-        localStorage.removeItem("cart");
-        setCart([]);
+        // localStorage.removeItem("cart");
+        // setCart([]);
         navigate("/");
       }
     } catch (error) {
@@ -714,8 +713,8 @@ const CheckoutPage = () => {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 sticky top-8 overflow-hidden">
+          <div className="lg:col-span-1 ">
+            <div className="bg-white rounded-2xl shadow-lg border border-gray-100 sticky top-20 overflow-hidden">
               <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-6">
                 <h2 className="text-xl font-semibold text-white flex items-center">
                   <svg

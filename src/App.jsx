@@ -11,8 +11,10 @@ import LoginPage from './user/pages/LoginPage';
 import RegisterPage from "./user/pages/RegisterPage";
 import AllProducts from './user/pages/AllProducts';
 import OrderHistory from './user/pages/OrderHistory';
+import ReturnRequestPage from "./user/pages/ReturnRequestPage";
 import VNPayReturnPage from './user/pages/VNPayReturnPage.JSX';
 import PaymentSuccessPage from './user/pages/PaymentSuccessPage';
+import PaymentFailurePage from "./user/pages/PaymentFailurePage";
 import PromotionProductsPage from "./user/pages/PromotionProductsPage";
 
 import LoginForm from "./admin/page/LoginPageAdmin";
@@ -75,12 +77,20 @@ function App() {
         element={<UserLayout><OrderHistory /></UserLayout>}
       />
       <Route
+        path="/return-request/:orderId"
+        element={<UserLayout><ReturnRequestPage /></UserLayout>}
+      />
+      <Route
         path="/vnpay-return"
         element={<VNPayReturnPage />}
       />
       <Route
         path="/payment-success"
         element={<PaymentSuccessPage />}
+      />
+      <Route
+        path="/payment-failure"
+        element={<PaymentFailurePage />}
       />
 
       {/* Layout cho admin */}

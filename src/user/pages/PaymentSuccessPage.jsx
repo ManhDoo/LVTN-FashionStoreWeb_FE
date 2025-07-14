@@ -203,32 +203,7 @@ const PaymentSuccessPage = () => {
             <p className="text-xs text-gray-500">
               Cảm ơn bạn đã sử dụng dịch vụ của chúng tôi
             </p>
-          </div>
-
-          {/* Demo Controls */}
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <p className="text-xs text-gray-400 mb-2">Demo Controls:</p>
-            <div className="flex gap-2 justify-center">
-              <button 
-                onClick={() => setStatus("loading")}
-                className="px-3 py-1 text-xs bg-blue-100 text-blue-700 rounded"
-              >
-                Loading
-              </button>
-              <button 
-                onClick={() => setStatus("success")}
-                className="px-3 py-1 text-xs bg-green-100 text-green-700 rounded"
-              >
-                Success
-              </button>
-              <button 
-                onClick={() => setStatus("error")}
-                className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded"
-              >
-                Error
-              </button>
-            </div>
-          </div>
+          </div>          
         </div>
       </div>
     </div>

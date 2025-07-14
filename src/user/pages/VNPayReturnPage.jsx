@@ -10,10 +10,14 @@ const VNPayReturnPage = () => {
   const message = queryParams.get("message");
 
   useEffect(() => {
-    console.log("status: ", status);
+        
     if (status === "success" && orderId) {
       navigate(`/payment-success?orderId=${orderId}`);
     }
+    if (status === "failure") {
+      navigate(`/payment-failure?orderId=${orderId}`);
+    }
+    console.log("status: ", status);
   }, [status, orderId, navigate]);
 
   return (

@@ -1,74 +1,83 @@
-import React, { useState, useEffect } from 'react';
-import useOrderHistory from '../hooks/useOrderHistory';
-import axiosInstance from '../utils/axios';
+import React, { useState, useEffect } from "react";
+import useOrderHistory from "../hooks/useOrderHistory";
+import axiosInstance from "../utils/axios";
 
 const OrderHistory = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
-  const [filter, setFilter] = useState('all');
-  const { orders, loading, error, fetchOrderHistory, cancelOrder } = useOrderHistory();
+  const [filter, setFilter] = useState("all");
+  const {
+    orders,
+    loading,
+    error,
+    fetchOrderHistory,
+    cancelOrder,
+    totalPages,
+    currentPage,
+    setCurrentPage,
+  } = useOrderHistory();
   const [cancelError, setCancelError] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'DA_HUY':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'CHO_XAC_NHAN':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'DANG_GIAO':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'DA_GIAO':
-        return 'bg-green-100 text-green-800 border-green-200';
+      case "DA_HUY":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "CHO_XAC_NHAN":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "DANG_GIAO":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "DA_GIAO":
+        return "bg-green-100 text-green-800 border-green-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
   const getStatusText = (status) => {
     switch (status) {
-      case 'DA_HUY':
-        return 'Đã hủy';
-      case 'CHO_XAC_NHAN':
-        return 'Chờ xác nhận';
-      case 'DANG_GIAO':
-        return 'Đang giao';
-      case 'DA_GIAO':
-        return 'Đã giao';
-      case 'DA_THANH_TOAN':
-        return 'Đã thanh toán';
+      case "DA_HUY":
+        return "Đã hủy";
+      case "CHO_XAC_NHAN":
+        return "Chờ xác nhận";
+      case "DANG_GIAO":
+        return "Đang giao";
+      case "DA_GIAO":
+        return "Đã giao";
+      case "DA_THANH_TOAN":
+        return "Đã thanh toán";
       default:
-        return 'Không xác định';
+        return "Không xác định";
     }
   };
 
   const formatDate = (dateString) => {
-    return new Date(dateString).toLocaleDateString('vi-VN', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit',
+    return new Date(dateString).toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
   const handleCancelOrder = async (maDonHang) => {
-    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) return;
-    
+    if (!confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) return;
+
     setCancelLoading(true);
     setCancelError(null);
-    
-    const result = await cancelOrder(maDonHang);
-  if (result.success) {
-    alert('Đơn hàng đã được hủy thành công!');
-  } else {
-    setCancelError(result.message);
-  }
 
-  setCancelLoading(false);
+    const result = await cancelOrder(maDonHang);
+    if (result.success) {
+      alert("Đơn hàng đã được hủy thành công!");
+    } else {
+      setCancelError(result.message);
+    }
+
+    setCancelLoading(false);
   };
 
-  const filteredOrders = orders.filter(order => {
-    if (filter === 'all') return true;
+  const filteredOrders = orders.filter((order) => {
+    if (filter === "all") return true;
     return order.trangThai === filter;
   });
 
@@ -96,7 +105,6 @@ const OrderHistory = () => {
     );
   }
 
-
   return (
     <div className="min-h-screen ">
       <div className="container mx-auto px-4 py-8">
@@ -107,14 +115,26 @@ const OrderHistory = () => {
               <h1 className="text-4xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent mb-2">
                 Lịch Sử Đơn Hàng
               </h1>
-              <p className="text-gray-600">Theo dõi và quản lý các đơn hàng của bạn</p>
+              <p className="text-gray-600">
+                Theo dõi và quản lý các đơn hàng của bạn
+              </p>
             </div>
             <button
-              onClick={() => window.location.href = '/'}
+              onClick={() => (window.location.href = "/")}
               className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full hover:from-pink-600 hover:to-purple-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M10 19l-7-7m0 0l7-7m-7 7h18"
+                />
               </svg>
               <span>Tiếp tục mua sắm</span>
             </button>
@@ -125,19 +145,19 @@ const OrderHistory = () => {
         <div className="mb-6">
           <div className="flex flex-wrap gap-3">
             {[
-              { key: 'all', label: 'Tất cả' },
-              { key: 'CHO_XAC_NHAN', label: 'Chờ xác nhận' },
-              { key: 'DANG_GIAO', label: 'Đang giao' },
-              { key: 'DA_GIAO', label: 'Đã giao' },
-              { key: 'DA_HUY', label: 'Đã hủy' },
+              { key: "all", label: "Tất cả" },
+              { key: "CHO_XAC_NHAN", label: "Chờ xác nhận" },
+              { key: "DANG_GIAO", label: "Đang giao" },
+              { key: "DA_GIAO", label: "Đã giao" },
+              { key: "DA_HUY", label: "Đã hủy" },
             ].map((filterOption) => (
               <button
                 key={filterOption.key}
                 onClick={() => setFilter(filterOption.key)}
                 className={`px-6 py-2 rounded-full transition-all duration-300 ${
                   filter === filterOption.key
-                    ? 'bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg'
+                    ? "bg-gradient-to-r from-pink-500 to-purple-500 text-white shadow-lg"
+                    : "bg-white text-gray-700 hover:bg-gray-50 shadow-md hover:shadow-lg"
                 }`}
               >
                 {filterOption.label}
@@ -158,12 +178,26 @@ const OrderHistory = () => {
           {filteredOrders.length === 0 ? (
             <div className="text-center py-12">
               <div className="w-24 h-24 mx-auto mb-4 bg-gradient-to-r from-pink-100 to-purple-100 rounded-full flex items-center justify-center">
-                <svg className="w-12 h-12 text-pink-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                <svg
+                  className="w-12 h-12 text-pink-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                  />
                 </svg>
               </div>
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">Chưa có đơn hàng nào</h3>
-              <p className="text-gray-500">Hãy bắt đầu mua sắm để tạo đơn hàng đầu tiên!</p>
+              <h3 className="text-xl font-semibold text-gray-700 mb-2">
+                Chưa có đơn hàng nào
+              </h3>
+              <p className="text-gray-500">
+                Hãy bắt đầu mua sắm để tạo đơn hàng đầu tiên!
+              </p>
             </div>
           ) : (
             filteredOrders.map((order) => (
@@ -184,14 +218,16 @@ const OrderHistory = () => {
                         </p>
                       </div>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(order.trangThai)}`}
+                        className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                          order.trangThai
+                        )}`}
                       >
                         {getStatusText(order.trangThai)}
                       </span>
                     </div>
                     <div className="mt-2 sm:mt-0 text-right">
                       <p className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-                        {(order.tongGia ?? 0).toLocaleString('vi-VN')} ₫
+                        {(order.tongGia ?? 0).toLocaleString("vi-VN")} ₫
                       </p>
                       <p className="text-sm text-gray-600">
                         {order.tongSoLuong ?? 0} sản phẩm
@@ -220,12 +256,14 @@ const OrderHistory = () => {
                             {item.tenSanPham}
                           </h4>
                           <div className="flex items-center space-x-4 mt-1">
-                            <span className="text-sm text-gray-500">SL: {item.soLuong}</span>
+                            <span className="text-sm text-gray-500">
+                              SL: {item.soLuong}
+                            </span>
                           </div>
                         </div>
                         <div className="text-right">
                           <p className="text-sm font-semibold text-pink-600">
-                            {(item.donGia ?? 0).toLocaleString('vi-VN')} ₫
+                            {(item.donGia ?? 0).toLocaleString("vi-VN")} ₫
                           </p>
                         </div>
                       </div>
@@ -240,15 +278,17 @@ const OrderHistory = () => {
                     >
                       Xem chi tiết
                     </button>
-                    {['CHO_XAC_NHAN', 'DA_THANH_TOAN'].includes(order.trangThai) && (
+                    {["CHO_XAC_NHAN", "DA_THANH_TOAN"].includes(
+                      order.trangThai
+                    ) && (
                       <button
                         onClick={() => handleCancelOrder(order.maDonHang)}
                         disabled={cancelLoading}
                         className={`flex-1 px-4 py-2 bg-gradient-to-r from-red-500 to-red-600 text-white rounded-lg hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md hover:shadow-lg ${
-                          cancelLoading ? 'opacity-50 cursor-not-allowed' : ''
+                          cancelLoading ? "opacity-50 cursor-not-allowed" : ""
                         }`}
                       >
-                        {cancelLoading ? 'Đang hủy...' : 'Hủy đơn hàng'}
+                        {cancelLoading ? "Đang hủy..." : "Hủy đơn hàng"}
                       </button>
                     )}
                   </div>
@@ -264,13 +304,25 @@ const OrderHistory = () => {
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
               <div className="px-6 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-bold">Chi tiết đơn hàng #{selectedOrder.maDonHang}</h2>
+                  <h2 className="text-xl font-bold">
+                    Chi tiết đơn hàng #{selectedOrder.maDonHang}
+                  </h2>
                   <button
                     onClick={() => setSelectedOrder(null)}
                     className="p-2 hover:bg-white/20 rounded-full transition-colors duration-200"
                   >
-                    <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    <svg
+                      className="w-6 h-6"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M6 18L18 6M6 6l12 12"
+                      />
                     </svg>
                   </button>
                 </div>
@@ -279,30 +331,58 @@ const OrderHistory = () => {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Ngày đặt:</span>
-                    <span className="font-semibold">{formatDate(selectedOrder.ngayTao)}</span>
+                    <span className="font-semibold">
+                      {formatDate(selectedOrder.ngayTao)}
+                    </span>
                   </div>
+                  {selectedOrder.ngayGiao && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Ngày giao:</span>
+                      <span className="font-semibold">
+                        {formatDate(selectedOrder.ngayGiao)}
+                      </span>
+                    </div>
+                  )}
+
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Trạng thái:</span>
-                    <span className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(selectedOrder.trangThai)}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-xs font-medium border ${getStatusColor(
+                        selectedOrder.trangThai
+                      )}`}
+                    >
                       {getStatusText(selectedOrder.trangThai)}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-gray-600">Địa chỉ giao hàng:</span>
-                    <span className="font-semibold">{selectedOrder.diaChi}</span>
+                    <span className="font-semibold">
+                      {selectedOrder.diaChi}
+                    </span>
                   </div>
                   <div className="border-t pt-4">
                     <h3 className="font-semibold mb-3">Sản phẩm đã đặt:</h3>
                     <div className="space-y-3">
                       {selectedOrder.items.map((item, index) => (
-                        <div key={index} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
-                          <img src={item.hinhAnh} alt={item.tenSanPham} className="w-12 h-12 object-cover rounded-lg" />
+                        <div
+                          key={index}
+                          className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                        >
+                          <img
+                            src={item.hinhAnh}
+                            alt={item.tenSanPham}
+                            className="w-12 h-12 object-cover rounded-lg"
+                          />
                           <div className="flex-1">
-                            <p className="font-medium text-sm">{item.tenSanPham}</p>
-                            <p className="text-xs text-gray-500">SL: {item.soLuong}</p>
+                            <p className="font-medium text-sm">
+                              {item.tenSanPham}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              SL: {item.soLuong}
+                            </p>
                           </div>
                           <span className="font-semibold text-pink-600">
-                            {(item.donGia ?? 0).toLocaleString('vi-VN')} ₫
+                            {(item.donGia ?? 0).toLocaleString("vi-VN")} ₫
                           </span>
                         </div>
                       ))}
@@ -311,15 +391,49 @@ const OrderHistory = () => {
                   <div className="border-t pt-4">
                     <div className="flex justify-between items-center text-lg font-bold">
                       <span>Tổng cộng:</span>
-                      <span className="text-pink-600">{(selectedOrder.tongGia ?? 0).toLocaleString('vi-VN')} ₫</span>
+                      <span className="text-pink-600">
+                        {(selectedOrder.tongGia ?? 0).toLocaleString("vi-VN")} ₫
+                      </span>
                     </div>
                   </div>
+                  {/* Button: Return/Refund */}
+{['DA_GIAO', 'DA_THANH_TOAN'].includes(selectedOrder.trangThai) && !selectedOrder.coYeuCauDoiTra && (
+  <div className="pt-4">
+    <button
+      onClick={() => {
+        window.location.href = `/return-request/${selectedOrder.maDonHang}`;
+      }}
+      className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-md hover:shadow-lg"
+    >
+      Trả hàng / Hoàn tiền
+    </button>
+  </div>
+)}
+
                 </div>
               </div>
             </div>
           </div>
         )}
       </div>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="mb-2 flex justify-center space-x-2">
+          {[...Array(totalPages)].map((_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i)}
+              className={`w-10 h-10 rounded-full border text-sm font-medium transition-all ${
+                currentPage === i
+                  ? "bg-pink-500 text-white border-pink-500"
+                  : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

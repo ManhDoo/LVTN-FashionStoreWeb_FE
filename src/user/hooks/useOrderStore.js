@@ -25,6 +25,7 @@ const useOrderStore = () => {
     try {
       setIsPlacingOrder(true);
       const response = await axios.post('/api/order/guest/place', orderData);
+      localStorage.removeItem("cart");
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Lỗi không xác định' };

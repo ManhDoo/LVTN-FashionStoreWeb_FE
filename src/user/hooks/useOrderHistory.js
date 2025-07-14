@@ -5,65 +5,72 @@ const useOrderHistory = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(0);
 
-  const fetchOrderHistory = async () => {
-    try {
-      const endpoint = `/api/order`;
-      const response = await axiosInstance.get(endpoint);
-      if (Array.isArray(response.data)) {
-        // Nhóm các dòng chi tiết theo maDonHang
-        const groupedOrders = response.data.reduce((acc, item) => {
-          const existingOrder = acc.find(order => order.maDonHang === item.maDonHang);
-          if (existingOrder) {
-            existingOrder.items.push({
-              maSanPham: item.maSanPham,
-              tenSanPham: item.tenSanPham,
-              hinhAnh: item.hinhAnh,
-              donGia: item.donGia,
-              soLuong: item.soLuong,
-              ngayTao: item.ngayTao,
-              trangThai: item.trangThai
-            });
-            existingOrder.tongGia = (existingOrder.tongGia || 0) + (item.donGia * item.soLuong);
-            existingOrder.tongSoLuong = (existingOrder.tongSoLuong || 0) + item.soLuong;
-          } else {
-            acc.push({
-              maDonHang: item.maDonHang,
-              tenNguoiNhan: item.tenNguoiNhan,
-              diaChi: item.diaChi,
-              soDienThoai: item.soDienThoai,
-              tongGia: item.donGia * item.soLuong,
-              tongSoLuong: item.soLuong,
-              ngayTao: item.ngayTao,
-              trangThai: item.trangThai, // Giả định trạng thái mặc định, cần lấy từ API nếu có
-              items: [{
-                maSanPham: item.maSanPham,
-                tenSanPham: item.tenSanPham,
-                hinhAnh: item.hinhAnh,
-                donGia: item.donGia,
-                soLuong: item.soLuong
-              }]
-            });
-          }
-          return acc;
-        }, []);
-        setOrders(groupedOrders);
+  const fetchOrderHistory = async (page = 0, size = 10) => {
+  try {
+    const endpoint = `/api/order?page=${page}&size=${size}`;
+    const response = await axiosInstance.get(endpoint);
+
+    const pageData = response.data;
+    const content = Array.isArray(pageData.content) ? pageData.content : [];
+
+    const groupedOrders = content.reduce((acc, item) => {
+      const existingOrder = acc.find(order => order.maDonHang === item.maDonHang);
+      if (existingOrder) {
+        existingOrder.items.push({
+          maSanPham: item.maSanPham,
+          tenSanPham: item.tenSanPham,
+          hinhAnh: item.hinhAnh,
+          donGia: item.donGia,
+          soLuong: item.soLuong,
+          ngayTao: item.ngayTao,
+          ngayGiao: item.ngayGiao,
+          trangThai: item.trangThai
+        });
+        existingOrder.tongGia += item.donGia * item.soLuong;
+        existingOrder.tongSoLuong += item.soLuong;
       } else {
-        setOrders([]);
+        acc.push({
+          maDonHang: item.maDonHang,
+          tenNguoiNhan: item.tenNguoiNhan,
+          diaChi: item.diaChi,
+          soDienThoai: item.soDienThoai,
+          tongGia: item.donGia * item.soLuong,
+          tongSoLuong: item.soLuong,
+          ngayTao: item.ngayTao,
+          ngayGiao: item.ngayGiao,
+          trangThai: item.trangThai,
+          items: [{
+            maSanPham: item.maSanPham,
+            tenSanPham: item.tenSanPham,
+            hinhAnh: item.hinhAnh,
+            donGia: item.donGia,
+            soLuong: item.soLuong
+          }]
+        });
       }
-    } catch (err) {
-      console.error('API Error:', err.response?.data || err.message);
-      setError('Không thể tải lịch sử mua hàng.');
-      setOrders([]);
-    } finally {
-      setLoading(false);
-    }
-  };
+      
+      return acc;
+    }, []);
+
+    setOrders(groupedOrders);
+    setTotalPages(pageData.totalPages || 1); // Thêm dòng này để lưu totalPages
+  } catch (err) {
+    console.error('API Error:', err.response?.data || err.message);
+    setError('Không thể tải lịch sử mua hàng.');
+    setOrders([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     setLoading(true);
-    fetchOrderHistory();
-  }, []);
+    fetchOrderHistory(currentPage);
+  }, [currentPage]);
 
   const cancelOrder = async (maDonHang) => {
     try {
@@ -79,7 +86,7 @@ const useOrderHistory = () => {
     }
   };
 
-  return { orders, loading, error, fetchOrderHistory, cancelOrder };
+  return { orders, loading, error, fetchOrderHistory, cancelOrder, totalPages, currentPage, setCurrentPage, };
 };
 
 export default useOrderHistory;

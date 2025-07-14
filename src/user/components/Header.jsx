@@ -16,6 +16,8 @@ const Header = () => {
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef();
   const navigate = useNavigate();
+  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
+  const lastScrollY = useRef(0);
 
   useEffect(() => {
     if (isAuthenticated && !user) {
@@ -24,31 +26,30 @@ const Header = () => {
   }, [isAuthenticated, user, fetchProfile]);
 
   useEffect(() => {
-  const fetchResults = async () => {
-    if (searchTerm.trim() === "") {
-      setSearchResults([]);
-      setShowSearchPopup(false);
-      setIsLoading(false);
-      return;
-    }
+    const fetchResults = async () => {
+      if (searchTerm.trim() === "") {
+        setSearchResults([]);
+        setShowSearchPopup(false);
+        setIsLoading(false);
+        return;
+      }
 
-    setIsLoading(true);
-    try {
-      const results = await searchProducts(searchTerm);
-      setSearchResults(results);
-      setShowSearchPopup(true);
-    } catch (err) {
-      console.error("Search error:", err);
-      setSearchResults([]);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+      setIsLoading(true);
+      try {
+        const results = await searchProducts(searchTerm);
+        setSearchResults(results);
+        setShowSearchPopup(true);
+      } catch (err) {
+        console.error("Search error:", err);
+        setSearchResults([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
 
-  const delayDebounce = setTimeout(fetchResults, 400);
-  return () => clearTimeout(delayDebounce);
-}, [searchTerm]);
-
+    const delayDebounce = setTimeout(fetchResults, 400);
+    return () => clearTimeout(delayDebounce);
+  }, [searchTerm]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -72,21 +73,25 @@ const Header = () => {
     return () => window.removeEventListener("storage", updateCartCount);
   }, []);
 
-  const handleCartClick = () => {
-    navigate("/cart");
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY;
 
-  const handleHomeClick = () => {
-    navigate("/");
-  };
+      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
+        // Cuộn xuống
+        setIsHeaderVisible(false);
+      } else {
+        // Cuộn lên
+        setIsHeaderVisible(true);
+      }
 
-  const handleLoginClick = () => {
-    navigate("/login");
-  };
+      lastScrollY.current = currentScrollY;
+    };
 
-  const handleOrderHistoryClick = () => {
-    navigate("/order");
-  };
+    window.addEventListener("scroll", handleScroll);
+
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const handleUserClick = () => {
     setShowLogout(!showLogout);
@@ -98,12 +103,21 @@ const Header = () => {
   };
 
   const handleProductClick = (productId) => {
-    navigate(`product/${productId}`);
+    navigate(`/product/${productId}`);
     setShowSearchPopup(false);
   };
 
   return (
-    <header className="fixed bg-white shadow-lg border-b border-pink-100 w-full top-0 z-9999">
+    <header
+      className={`fixed bg-white w-full top-0 z-9999 transition-transform duration-300 ${
+        isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+      }`}
+    >
+
+
+    {/* //   <header
+    //   className="absolute bg-white w-full top-0 z-9999 transition-transform duration-300"
+    // > */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo Section */}
@@ -113,7 +127,7 @@ const Header = () => {
                 src={logo}
                 alt="Fashion Store Logo"
                 className="h-12 w-auto cursor-pointer transition-transform duration-300 group-hover:scale-105"
-                onClick={handleHomeClick}
+                onClick={() => navigate("/")}
               />
               <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-purple-400 opacity-0 group-hover:opacity-10 rounded-lg transition-opacity duration-300"></div>
             </div>
@@ -252,7 +266,7 @@ const Header = () => {
             ) : (
               <button
                 className="flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-                onClick={handleLoginClick}
+                onClick={() => navigate("/login")}
               >
                 <div className="p-1 bg-white/20 rounded-full">
                   <svg
@@ -277,7 +291,7 @@ const Header = () => {
             {/* Cart Button */}
             <button
               className="relative flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-pink-500 to-rose-500 text-white hover:from-pink-600 hover:to-rose-600 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105"
-              onClick={handleCartClick}
+              onClick={() => navigate("/cart")}
             >
               <div className="p-1 bg-white/20 rounded-full">
                 <svg
@@ -307,57 +321,140 @@ const Header = () => {
         </div>
       </div>
 
-              {/* Search Results Popup */}
-              {showSearchPopup && searchResults.length > 0 && (
-                <div
-                  ref={popupRef}
-                  className="absolute left-0 top-full mt-3 bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-4xl z-[9999] p-6 border border-pink-100 animate-in fade-in slide-in-from-top-4 duration-300"
+      {/* Search Results Popup */}
+
+      {/* Search Results Popup - Fullscreen */}
+      {showSearchPopup && searchResults.length > 0 && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-[9999] flex items-start justify-center pt-20">
+          <div
+            ref={popupRef}
+            className="bg-white/95 backdrop-blur-md shadow-2xl rounded-2xl w-full max-w-7xl mx-4 max-h-[80vh] overflow-hidden border border-pink-100 animate-in fade-in slide-in-from-top-4 duration-300"
+          >
+            {/* Header với nút đóng */}
+            <div className="sticky top-0 bg-white/95 backdrop-blur-md px-6 py-4 border-b border-pink-100 flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65l4.35 4.35z"
+                    />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-800">
+                    Kết quả tìm kiếm
+                  </h3>
+                  <p className="text-sm text-gray-500">
+                    Tìm thấy {searchResults.length} sản phẩm cho "{searchTerm}"
+                  </p>
+                </div>
+              </div>
+
+              {/* Nút đóng */}
+              <button
+                onClick={() => setShowSearchPopup(false)}
+                className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-200 group"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-6 w-6 text-gray-400 group-hover:text-gray-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
                 >
-                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {searchResults.map((product) => (
-                      <div
-                        key={product.maSanPham}
-                        className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-xl p-3 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 hover:border-pink-200 hover:bg-white"
-                        onClick={() => handleProductClick(product.maSanPham)}
-                      >
-                        <div className="relative overflow-hidden rounded-lg">
-                          <img
-                            src={product.hinhAnh[0]}
-                            alt={product.tensp}
-                            className="w-full h-32 object-cover transition-transform duration-300 group-hover:scale-110"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                          <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                            <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                className="h-3 w-3 text-pink-500"
-                                fill="none"
-                                viewBox="0 0 24 24"
-                                stroke="currentColor"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  strokeWidth={2}
-                                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
-                                />
-                              </svg>
-                            </div>
-                          </div>
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Nội dung có thể cuộn */}
+            <div className="overflow-y-auto max-h-[calc(80vh-80px)] p-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+                {searchResults.map((product) => (
+                  <div
+                    key={product.maSanPham}
+                    className="group cursor-pointer bg-white/80 backdrop-blur-sm rounded-xl p-4 hover:shadow-xl transition-all duration-300 hover:scale-105 border border-gray-100 hover:border-pink-200 hover:bg-white"
+                    onClick={() => handleProductClick(product.maSanPham)}
+                  >
+                    <div className="relative overflow-hidden rounded-lg mb-3">
+                      <img
+                        src={product.hinhAnh[0]}
+                        alt={product.tensp}
+                        className="w-full h-48 object-cover transition-transform duration-300 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                      <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <div className="bg-white/90 backdrop-blur-sm rounded-full p-1.5">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="h-4 w-4 text-pink-500"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                            />
+                          </svg>
                         </div>
-                        <h3 className="font-semibold mt-2 text-sm text-gray-800 truncate group-hover:text-pink-600 transition-colors duration-300">
-                          {product.tensp}
-                        </h3>
-                        <p className="text-pink-600 font-bold text-sm">
-                          {product.giaGoc.toLocaleString("vi-VN")} VND
-                        </p>
                       </div>
-                    ))}
+                    </div>
+                    <h3 className="font-semibold text-sm text-gray-800 line-clamp-2 group-hover:text-pink-600 transition-colors duration-300 mb-2">
+                      {product.tensp}
+                    </h3>
+                    <p className="text-pink-600 font-bold text-sm">
+                      {product.giaGoc.toLocaleString("vi-VN")} VND
+                    </p>
                   </div>
+                ))}
+              </div>
+
+              {/* Nếu không có kết quả */}
+              {searchResults.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="p-4 bg-gray-100 rounded-full w-20 h-20 mx-auto mb-4 flex items-center justify-center">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-8 w-8 text-gray-400"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1116.65 16.65l4.35 4.35z"
+                      />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                    Không tìm thấy sản phẩm nào
+                  </h3>
+                  <p className="text-gray-500">Thử tìm kiếm với từ khóa khác</p>
                 </div>
               )}
-
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };
