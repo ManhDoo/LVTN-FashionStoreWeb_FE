@@ -1,6 +1,7 @@
-import React, { useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
-import useProductStore from '../hooks/useProductStore';
+import React, { useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import useProductStore from "../hooks/useProductStore";
+import { slugify } from "../utils/slugify";
 
 const ProductSection = ({ category }) => {
   const { products } = useProductStore(category);
@@ -8,11 +9,11 @@ const ProductSection = ({ category }) => {
   const scrollRef = useRef();
 
   const scrollLeft = () => {
-    scrollRef.current.scrollBy({ left: -300, behavior: 'smooth' });
+    scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
   };
 
   const scrollRight = () => {
-    scrollRef.current.scrollBy({ left: 300, behavior: 'smooth' });
+    scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   };
 
   // Function to calculate discounted price
@@ -20,9 +21,9 @@ const ProductSection = ({ category }) => {
     if (!product.khuyenMai || product.khuyenMai.giaTriGiam === 0) {
       return null;
     }
-    
+
     const discount = product.khuyenMai.giaTriGiam;
-    if (product.khuyenMai.hinhThucGiam === 'Phần trăm') {
+    if (product.khuyenMai.hinhThucGiam === "Phần trăm") {
       return product.giaGoc * (1 - discount / 100);
     }
     return product.giaGoc - discount;
@@ -32,7 +33,10 @@ const ProductSection = ({ category }) => {
     <div className="bg-white p-4 mt-4 relative">
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-2xl font-bold">{category}</h2>
-        <a href={`/all/${category}`} className="text-blue-500 hover:underline">
+        <a
+          href={`/gender/${encodeURIComponent(category)}`}
+          className="text-blue-500 hover:underline"
+        >
           Xem tất cả
         </a>
       </div>
@@ -59,12 +63,15 @@ const ProductSection = ({ category }) => {
         >
           {products.map((product) => {
             const discountedPrice = calculateDiscountedPrice(product);
-            
+
             return (
               <div
                 key={product.maSanPham}
                 className="min-w-[300px] cursor-pointer"
-                onClick={() => navigate(`/product/${product.maSanPham}`)}
+                onClick={() =>
+                  navigate(`/product/${slugify(product.tensp)}-${product.maSanPham}`)
+
+                }
               >
                 <div className="relative">
                   <img
@@ -72,31 +79,32 @@ const ProductSection = ({ category }) => {
                     alt={product.tensp}
                     className="h-[480px] w-full object-cover rounded-md"
                   />
-                  {product.khuyenMai && product.khuyenMai.giaTriGiam > 0 && (
-                    <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-full text-sm">
-                      - {product.khuyenMai.giaTriGiam}{product.khuyenMai.hinhThucGiam === 'Phần trăm' ? '%' : 'K'}
-                    </span>
-                  )}
+                  {product.khuyenMai &&
+                    product.khuyenMai.giaTriGiam > 0 &&
+                    product.khuyenMai.trangThai !== "Đã kết thúc" && (
+                      <span className="absolute top-2 right-2 bg-red-600 text-white px-2 py-1 rounded-full text-sm">
+                        - {product.khuyenMai.giaTriGiam}
+                        {product.khuyenMai.hinhThucGiam === "Phần trăm"
+                          ? "%"
+                          : "K"}
+                      </span>
+                    )}
                 </div>
-                <div className="flex space-x-2 mt-2">
-                  <span className="text-black text-4xl">●</span>
-                  <span className="text-blue-500 text-4xl">●</span>
-                  <span className="text-red-500 text-4xl">●</span>
-                </div>
+
                 <p className="font-bold mt-2">{product.tensp}</p>
                 <div className="flex items-center space-x-2">
                   {discountedPrice ? (
                     <>
                       <p className="text-red-500 text-lg font-semibold">
-                        {discountedPrice.toLocaleString('vi-VN')} VND
+                        {discountedPrice.toLocaleString("vi-VN")} VND
                       </p>
                       <p className="text-gray-500 line-through">
-                        {product.giaGoc.toLocaleString('vi-VN')} VND
+                        {product.giaGoc.toLocaleString("vi-VN")} VND
                       </p>
                     </>
                   ) : (
                     <p className="text-red-500">
-                      {product.giaGoc.toLocaleString('vi-VN')} VND
+                      {product.giaGoc.toLocaleString("vi-VN")} VND
                     </p>
                   )}
                 </div>

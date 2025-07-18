@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../hooks/useCategoryStore";
+import { slugify } from "../utils/slugify";
 
 const Menu = () => {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ const Menu = () => {
   const { categories } = useCategoryStore(hoverGender);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
   const lastScrollY = useRef(0);
+  const timeoutRef = useRef(null);
 
   const menuItems = [
     { label: "TRANG CHỦ", path: "/" },
@@ -24,9 +26,42 @@ const Menu = () => {
     navigate(item.path);
   };
 
-  const handleCategoryClick = (maDanhMuc) => {
+  const handleCategoryClick = (cat) => {
     setShowPopup(false);
-    navigate(`/all/${maDanhMuc}`);
+    const slug = slugify(cat.tendm);
+    navigate(`/category/${slug}-${cat.maDanhMuc}`);
+  };
+
+  const handleMouseEnter = (item) => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+    
+    if (item.label === "NAM") {
+      setHoverGender("Nam");
+      setShowPopup(true);
+    } else if (item.label === "NỮ") {
+      setHoverGender("Nu");
+      setShowPopup(true);
+    } else {
+      setShowPopup(false);
+    }
+  };
+
+  const handleMouseLeave = () => {
+    timeoutRef.current = setTimeout(() => {
+      setShowPopup(false);
+    }, 200);
+  };
+
+  const handlePopupMouseEnter = () => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+  };
+
+  const handlePopupMouseLeave = () => {
+    setShowPopup(false);
   };
 
   useEffect(() => {
@@ -34,10 +69,8 @@ const Menu = () => {
       const currentScrollY = window.scrollY;
 
       if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
-        // Cuộn xuống
         setIsHeaderVisible(false);
       } else {
-        // Cuộn lên
         setIsHeaderVisible(true);
       }
 
@@ -46,18 +79,20 @@ const Menu = () => {
 
     window.addEventListener("scroll", handleScroll);
 
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+    };
   }, []);
 
   return (
     <nav
-      className={`fixed w-full bg-white shadow-md border-b border-pink-100/50 mt-19 z-99 ${
+      className={`fixed w-full bg-white shadow-md border-b border-pink-100/50 mt-19 z-99 transition-transform duration-300 ${
         isHeaderVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >
-       {/* <nav
-      className="absolute w-full bg-white shadow-md border-b border-pink-100/50 mt-19 z-99"
-    > */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-center items-center py-4">
           <div className="flex space-x-8">
@@ -65,18 +100,8 @@ const Menu = () => {
               <div
                 key={index}
                 className="relative"
-                onMouseEnter={() => {
-                  if (item.label === "NAM") {
-                    setHoverGender("Nam");
-                    setShowPopup(true);
-                  } else if (item.label === "NỮ") {
-                    setHoverGender("Nu");
-                    setShowPopup(true);
-                  } else {
-                    setShowPopup(false);
-                  }
-                }}
-                onMouseLeave={() => setShowPopup(false)}
+                onMouseEnter={() => handleMouseEnter(item)}
+                onMouseLeave={handleMouseLeave}
               >
                 <button
                   onClick={() => handleMenuClick(item)}
@@ -87,24 +112,82 @@ const Menu = () => {
                   }`}
                 >
                   {item.label}
+                  {(item.label === "NAM" || item.label === "NỮ") && (
+                    <svg
+                      className="w-4 h-4 ml-2 inline-block transition-transform duration-200"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      style={{
+                        transform: showPopup && 
+                          ((hoverGender === "Nam" && item.label === "NAM") ||
+                           (hoverGender === "Nu" && item.label === "NỮ")) 
+                          ? "rotate(180deg)" : "rotate(0deg)"
+                      }}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                  )}
                 </button>
 
                 {showPopup &&
                   ((hoverGender === "Nam" && item.label === "NAM") ||
                     (hoverGender === "Nu" && item.label === "NỮ")) &&
                   categories.length > 0 && (
-                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-44 bg-white shadow-lg rounded-md border border-gray-200 z-50">
-                      <ul className="py-2 px-3 space-y-1">
-                        {categories.map((cat) => (
-                          <li
-                            key={cat.maDanhMuc}
-                            className="hover:text-pink-600 cursor-pointer text-sm"
-                            onClick={() => handleCategoryClick(cat.maDanhMuc)}
-                          >
-                            {cat.tendm}
-                          </li>
-                        ))}
-                      </ul>
+                    <div 
+                      className="absolute top-full left-1/2 transform -translate-x-1/2 mt-2 w-72 bg-white shadow-2xl rounded-xl border border-gray-100 z-50 overflow-hidden animate-in fade-in-0 zoom-in-95 duration-200"
+                      onMouseEnter={handlePopupMouseEnter}
+                      onMouseLeave={handlePopupMouseLeave}
+                    >
+                      {/* Header của popup */}
+                      <div className="bg-gradient-to-r from-pink-50 to-purple-50 px-4 py-3 border-b border-gray-100">
+                        <h3 className="text-sm font-semibold text-gray-800 flex items-center">
+                          <span className="w-2 h-2 bg-pink-500 rounded-full mr-2"></span>
+                          Danh mục {item.label.toLowerCase()}
+                        </h3>
+                      </div>
+
+                      {/* Danh sách categories */}
+                      <div className="max-h-80 overflow-y-auto">
+                        <ul className="py-2">
+                          {categories.map((cat, catIndex) => (
+                            <li
+                              key={cat.maDanhMuc}
+                              className="group relative"
+                            >
+                              <button
+                                onClick={() => handleCategoryClick(cat)}
+                                className="w-full text-left px-4 py-3 text-sm text-gray-700 hover:text-pink-600 hover:bg-gradient-to-r hover:from-pink-50 hover:to-purple-50 transition-all duration-200 flex items-center justify-between group"
+                              >
+                                <span className="font-medium">{cat.tendm}</span>
+                                <svg
+                                  className="w-4 h-4 text-gray-400 group-hover:text-pink-500 transform group-hover:translate-x-1 transition-all duration-200"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                </svg>
+                              </button>
+                              {catIndex < categories.length - 1 && (
+                                <div className="mx-4 border-b border-gray-100"></div>
+                              )}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+
+                      {/* Footer của popup */}
+                      <div className="bg-gray-50 px-4 py-3 border-t border-gray-100">
+                        <p className="text-xs text-gray-500 text-center">
+                          {categories.length} danh mục có sẵn
+                        </p>
+                      </div>
+
+                      {/* Mũi tên chỉ lên */}
+                      <div className="absolute -top-2 left-1/2 transform -translate-x-1/2">
+                        <div className="w-4 h-4 bg-white border-l border-t border-gray-100 transform rotate-45"></div>
+                      </div>
                     </div>
                   )}
               </div>

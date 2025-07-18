@@ -5,7 +5,7 @@ import axios from '../utils/axios'; // đã có interceptor Bearer
 const useOrderStore = () => {
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
 
-  const placeOrder = async ({ user, name, phone, email, address, provinceName, districtName, wardName, cart, pttt }) => {
+  const placeOrder = async ({ user, name, phone, email, address, provinceName, districtName, wardName, cart, pttt, phiGiaoHang }) => {
     const orderData = {
       maKhachHang: user ? user.maKhachHang : null,
       tenNguoiNhan: name,
@@ -20,6 +20,7 @@ const useOrderStore = () => {
         quantity: item.quantity,
       })),
       pttt: pttt,
+      phiGiaoHang: phiGiaoHang
     };
 
     try {

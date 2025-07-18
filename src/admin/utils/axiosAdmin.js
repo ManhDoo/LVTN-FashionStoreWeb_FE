@@ -21,6 +21,7 @@ axiosAdmin.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       // Token hết hạn hoặc không hợp lệ
       localStorage.removeItem('tokenAdmin');
+      localStorage.removeItem('quyen');
 
       // Chuyển hướng đến trang đăng nhập admin
       window.location.href = '/admin';

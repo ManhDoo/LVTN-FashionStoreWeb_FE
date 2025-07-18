@@ -145,6 +145,7 @@ const CheckoutPage = () => {
         wardName,
         cart,
         pttt: paymentMethod,
+        phiGiaoHang: shippingFee,
       };
 
       const response = await placeOrder(orderData);

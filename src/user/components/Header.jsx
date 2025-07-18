@@ -62,16 +62,26 @@ const Header = () => {
   }, []);
 
   useEffect(() => {
-    const updateCartCount = () => {
-      const cart = getCart();
-      const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-      setCartItemCount(totalItems);
-    };
+  const updateCartCount = () => {
+    const cart = getCart();
+    const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+    setCartItemCount(totalItems);
+  };
 
-    updateCartCount();
-    window.addEventListener("storage", updateCartCount);
-    return () => window.removeEventListener("storage", updateCartCount);
-  }, []);
+  // Cập nhật lần đầu
+  updateCartCount();
+
+  // Lắng nghe sự kiện cartUpdated (cho cùng tab)
+  window.addEventListener('cartUpdated', updateCartCount);
+  // Lắng nghe sự kiện storage (cho các tab khác)
+  window.addEventListener('storage', updateCartCount);
+
+  // Dọn dẹp sự kiện khi component unmount
+  return () => {
+    window.removeEventListener('cartUpdated', updateCartCount);
+    window.removeEventListener('storage', updateCartCount);
+  };
+}, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -238,6 +248,30 @@ const Header = () => {
                         />
                       </svg>
                       <span>Đơn hàng</span>
+                    </button>
+
+                    <button
+                      className="w-full px-6 py-3 text-left text-blue-600 hover:bg-blue-50 transition-colors duration-200 flex items-center space-x-2"
+                      onClick={() => {
+                        navigate("/list-return");
+                        setShowLogout(false);
+                      }}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        className="h-4 w-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M3 7h18M3 12h18M3 17h18"
+                        />
+                      </svg>
+                      <span>Yêu cầu hoàn trả</span>
                     </button>
 
                     <button

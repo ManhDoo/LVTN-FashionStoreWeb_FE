@@ -14,24 +14,25 @@ const ProductCreate = () => {
     moTa,
     setMoTa,
     hinhAnhSanPham,
-    details,
+    colorDetails,
     success,
     error,
     uploading,
     handleProductImageChange,
-    handleDetailImageChange,
     removeProductImage,
-    removeDetailImage,
-    handleAddDetail,
-    handleRemoveDetail,
-    handleDetailChange,
+    handleColorDetailChange,
+    handleSizeDetailChange,
+    addSizeToColor,
+    removeSizeFromColor,
+    addColorDetail,
+    removeColorDetail,
     handleSubmit,
     resetForm,
   } = useProductAdmin();
 
   const { colors, error: colorError, loading: colorLoading } = useColorAdmin();
   const { sizes, error: sizeError, loading: sizeLoading } = useSizeAdmin();
-  const { danhMucList, error: categoryError, isLoading: categoryLoading, setDanhMucList } = useCategoryAdmin();
+  const { danhMucList, error: categoryError, isLoading: categoryLoading } = useCategoryAdmin();
   const [maDanhMuc, setMaDanhMuc] = React.useState('');
 
   return (
@@ -46,7 +47,7 @@ const ProductCreate = () => {
         <div className="text-blue-500 mb-4">Đang tải dữ liệu...</div>
       )}
       <form onSubmit={(e) => handleSubmit(e, maDanhMuc)} className="space-y-6">
-        {/* Thông tin sản phẩm */}
+        {/* Product Information */}
         <div className="bg-white shadow rounded-lg p-6">
           <h3 className="text-lg font-medium mb-4">Thông tin sản phẩm</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -136,29 +137,29 @@ const ProductCreate = () => {
           </div>
         </div>
 
-        {/* Chi tiết sản phẩm */}
+        {/* Product Color Details */}
         <div className="bg-white shadow rounded-lg p-6">
-          <h3 className="text-lg font-medium mb-4">Chi tiết sản phẩm</h3>
-          {details.map((detail, index) => (
-            <div key={index} className="mb-4 p-4 border rounded-md relative">
-              <h4 className="font-medium mb-2">Chi tiết {index + 1}</h4>
-              {details.length > 1 && (
+          <h3 className="text-lg font-medium mb-4">Chi tiết sản phẩm theo màu</h3>
+          {colorDetails.map((colorDetail, colorIndex) => (
+            <div key={colorIndex} className="mb-6 p-4 border rounded-md relative">
+              <h4 className="font-medium mb-2">Màu sắc {colorIndex + 1}</h4>
+              {colorDetails.length > 1 && (
                 <button
                   type="button"
-                  onClick={() => handleRemoveDetail(index)}
+                  onClick={() => removeColorDetail(colorIndex)}
                   className="absolute top-2 right-2 text-red-500 hover:text-red-700"
                 >
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               )}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block mb-1 font-medium">
                     Màu sắc <span className="text-red-500">*</span>
                   </label>
                   <select
-                    value={detail.maMau}
-                    onChange={(e) => handleDetailChange(index, 'maMau', e.target.value)}
+                    value={colorDetail.maMau}
+                    onChange={(e) => handleColorDetailChange(colorIndex, 'maMau', e.target.value)}
                     className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   >
@@ -170,44 +171,26 @@ const ProductCreate = () => {
                     ))}
                   </select>
                 </div>
-                <div>
-                  <label className="block mb-1 font-medium">
-                    Kích cỡ <span className="text-red-500">*</span>
-                  </label>
-                  <select
-                    value={detail.maKichCo}
-                    onChange={(e) => handleDetailChange(index, 'maKichCo', e.target.value)}
-                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  >
-                    <option value="">-- Chọn kích cỡ --</option>
-                    {sizes.map((size) => (
-                      <option key={size.maKichCo} value={size.maKichCo}>
-                        {size.tenKichCo}
-                      </option>
-                    ))}
-                  </select>
-                </div>
                 <div className="md:col-span-2">
                   <label className="block mb-1 font-medium">Hình ảnh chi tiết</label>
                   <input
                     type="file"
                     accept="image/*"
                     multiple
-                    onChange={(e) => handleDetailImageChange(index, e)}
+                    onChange={(e) => handleColorDetailChange(colorIndex, 'hinhAnh', e)}
                     className="w-full p-2 border rounded-md"
                   />
                   <div className="mt-2 flex flex-wrap gap-2">
-                    {detail.hinhAnh.map((url, imgIndex) => (
+                    {colorDetail.hinhAnh.map((url, imgIndex) => (
                       <div key={imgIndex} className="relative">
                         <img
                           src={url}
-                          alt={`Detail ${index + 1} Image ${imgIndex + 1}`}
+                          alt={`Color ${colorIndex + 1} Image ${imgIndex + 1}`}
                           className="w-32 h-32 object-cover rounded"
                         />
                         <button
                           type="button"
-                          onClick={() => removeDetailImage(index, imgIndex)}
+                          onClick={() => handleColorDetailChange(colorIndex, 'hinhAnh', imgIndex)}
                           className="absolute top-0 right-0 text-red-500 hover:text-red-700"
                         >
                           <XMarkIcon className="w-5 h-5" />
@@ -216,38 +199,85 @@ const ProductCreate = () => {
                     ))}
                   </div>
                 </div>
-                <div>
-                  <label className="block mb-1 font-medium">Giá thêm (VND)</label>
-                  <input
-                    type="number"
-                    value={detail.giaThem}
-                    onChange={(e) => handleDetailChange(index, 'giaThem', e.target.value)}
-                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block mb-1 font-medium">
-                    Tồn kho <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="number"
-                    value={detail.tonKho}
-                    onChange={(e) => handleDetailChange(index, 'tonKho', e.target.value)}
-                    className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    required
-                    min="0"
-                  />
-                </div>
               </div>
+              <h5 className="font-medium mb-2">Kích cỡ cho màu này</h5>
+              {colorDetail.sizes.map((sizeDetail, sizeIndex) => (
+                <div key={sizeIndex} className="ml-4 mb-4 p-4 border rounded-md relative">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block mb-1 font-medium">
+                        Kích cỡ <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        value={sizeDetail.maKichCo}
+                        onChange={(e) =>
+                          handleSizeDetailChange(colorIndex, sizeIndex, 'maKichCo', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      >
+                        <option value="">-- Chọn kích cỡ --</option>
+                        {sizes.map((size) => (
+                          <option key={size.maKichCo} value={size.maKichCo}>
+                            {size.tenKichCo}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">
+                        Tồn kho <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        value={sizeDetail.tonKho}
+                        onChange={(e) =>
+                          handleSizeDetailChange(colorIndex, sizeIndex, 'tonKho', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                        min="0"
+                      />
+                    </div>
+                    <div>
+                      <label className="block mb-1 font-medium">Giá thêm (VND)</label>
+                      <input
+                        type="number"
+                        value={sizeDetail.giaThem}
+                        onChange={(e) =>
+                          handleSizeDetailChange(colorIndex, sizeIndex, 'giaThem', e.target.value)
+                        }
+                        className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
+                      />
+                    </div>
+                  </div>
+                  {colorDetail.sizes.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeSizeFromColor(colorIndex, sizeIndex)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                    >
+                      <XMarkIcon className="w-5 h-5" />
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() => addSizeToColor(colorIndex)}
+                className="ml-4 mt-2 bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600"
+              >
+                Thêm kích cỡ
+              </button>
             </div>
           ))}
           <button
             type="button"
-            onClick={handleAddDetail}
+            onClick={addColorDetail}
             className="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600"
           >
-            Thêm chi tiết
+            Thêm màu mới
           </button>
         </div>
 

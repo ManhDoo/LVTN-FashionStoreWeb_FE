@@ -5,6 +5,8 @@ import {
   ChevronRightIcon,
   BriefcaseIcon,
   TagIcon,
+  ArrowPathIcon,
+  BanknotesIcon
 } from "@heroicons/react/24/outline";
 import { useLocation, Link } from "react-router-dom";
 
@@ -225,9 +227,16 @@ const Sidebar = () => {
             {openMenus["promotions"] && (
               <ul className="pl-10 text-sm text-gray-600">
                 <li>
-                  <a href="/order" className="block p-2 hover:bg-gray-100">
+                 <Link
+                    to="/promotion-page"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/promotion-page"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
                     Danh sách khuyến mãi
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="block p-2 hover:bg-gray-100">
@@ -237,6 +246,90 @@ const Sidebar = () => {
                 <li>
                   <a href="#" className="block p-2 hover:bg-gray-100">
                     Khuyến mãi sắp hết hạn
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* Đơn hoàn trả */}
+          <li className="mt-2">
+            <button
+              onClick={() => toggleMenu("returns")}
+              className="flex items-center w-full p-3 text-gray-700 hover:bg-gray-100"
+            >
+              <ArrowPathIcon className="w-6 h-6 mr-3" />
+              <span>Đơn hoàn trả</span>
+              <ChevronRightIcon
+                className={`w-4 h-4 ml-auto transform ${
+                  openMenus["returns"] ? "rotate-90" : ""
+                }`}
+              />
+            </button>
+            {openMenus["returns"] && (
+              <ul className="pl-10 text-sm text-gray-600">
+                <li>
+                 <Link
+                    to="/return-request-page"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/return-request-page"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
+                    Danh sách đơn hoàn trả
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="block p-2 hover:bg-gray-100">
+                    Chưa giải quyết
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="block p-2 hover:bg-gray-100">
+                    Đã xác nhận
+                  </a>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* Hóa đơn */}
+          <li className="mt-2">
+            <button
+              onClick={() => toggleMenu("bills")}
+              className="flex items-center w-full p-3 text-gray-700 hover:bg-gray-100"
+            >
+              <BanknotesIcon className="w-6 h-6 mr-3" />
+              <span>Hóa đơn</span>
+              <ChevronRightIcon
+                className={`w-4 h-4 ml-auto transform ${
+                  openMenus["bills"] ? "rotate-90" : ""
+                }`}
+              />
+            </button>
+            {openMenus["bills"] && (
+              <ul className="pl-10 text-sm text-gray-600">
+                <li>
+                 <Link
+                    to="/bills"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/bills"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
+                    Danh sách hóa đơn
+                  </Link>
+                </li>
+                <li>
+                  <a href="#" className="block p-2 hover:bg-gray-100">
+                    Chưa giải quyết
+                  </a>
+                </li>
+                <li>
+                  <a href="#" className="block p-2 hover:bg-gray-100">
+                    Đã xác nhận
                   </a>
                 </li>
               </ul>

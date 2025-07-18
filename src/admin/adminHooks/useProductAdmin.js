@@ -1,24 +1,24 @@
 import { useState, useEffect } from 'react';
 import axiosAdmin from '../utils/axiosAdmin';
-import { uploadMultipleImages } from '../../user/utils/cloudinary'; // Adjust path based on your project structure
+import { uploadMultipleImages } from '../../user/utils/cloudinary';
 import { useNavigate } from 'react-router-dom';
 
 const useProductAdmin = () => {
   const [products, setProducts] = useState([]);
-  const [page, setPage] = useState(0); // bắt đầu từ 0
+  const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [uploading, setUploading] = useState(false);
   const navigate = useNavigate();
 
-  // State cho form tạo sản phẩm
+  // Product form state
   const [tenSanPham, setTenSanPham] = useState('');
   const [giaGoc, setGiaGoc] = useState(0);
   const [moTa, setMoTa] = useState('');
   const [hinhAnhSanPham, setHinhAnhSanPham] = useState([]);
-  const [details, setDetails] = useState([
-    { maKichCo: '', maMau: '', hinhAnh: [], giaThem: 0, tonKho: 0 },
+  const [colorDetails, setColorDetails] = useState([
+    { maMau: '', hinhAnh: [], sizes: [{ maKichCo: '', giaThem: 0, tonKho: 0 }] },
   ]);
   const [success, setSuccess] = useState(null);
 
@@ -28,7 +28,7 @@ const useProductAdmin = () => {
       const res = await axiosAdmin.get(`/api/products?page=${currentPage}`);
       setProducts(res.data.content);
       setTotalPages(res.data.totalPages);
-      setPage(res.data.number); // cập nhật lại page hiện tại
+      setPage(res.data.number);
       setError(null);
     } catch (err) {
       setError(err.message || 'Lỗi khi tải danh sách sản phẩm');
@@ -49,50 +49,62 @@ const useProductAdmin = () => {
     }
   };
 
-  // Xử lý chọn nhiều ảnh cho sản phẩm
   const handleProductImageChange = async (e) => {
     const files = e.target.files;
     const urls = await uploadMultipleImages(files, setUploading, setError);
     setHinhAnhSanPham([...hinhAnhSanPham, ...urls]);
   };
 
-  // Xử lý chọn nhiều ảnh cho chi tiết sản phẩm
-  const handleDetailImageChange = async (index, e) => {
-    const files = e.target.files;
-    const urls = await uploadMultipleImages(files, setUploading, setError);
-    const updatedDetails = [...details];
-    updatedDetails[index].hinhAnh = [...updatedDetails[index].hinhAnh, ...urls];
-    setDetails(updatedDetails);
-  };
-
-  // Xóa ảnh khỏi sản phẩm
   const removeProductImage = (index) => {
     setHinhAnhSanPham(hinhAnhSanPham.filter((_, i) => i !== index));
   };
 
-  // Xóa ảnh khỏi chi tiết sản phẩm
-  const removeDetailImage = (detailIndex, imageIndex) => {
-    const updatedDetails = [...details];
-    updatedDetails[detailIndex].hinhAnh = updatedDetails[detailIndex].hinhAnh.filter(
-      (_, i) => i !== imageIndex
-    );
-    setDetails(updatedDetails);
+  const handleColorDetailChange = async (colorIndex, field, value) => {
+    const updatedColorDetails = [...colorDetails];
+    if (field === 'hinhAnh' && value instanceof Event) {
+      const files = value.target.files;
+      const urls = await uploadMultipleImages(files, setUploading, setError);
+      updatedColorDetails[colorIndex].hinhAnh = [...updatedColorDetails[colorIndex].hinhAnh, ...urls];
+    } else if (field === 'hinhAnh') {
+      updatedColorDetails[colorIndex].hinhAnh = updatedColorDetails[colorIndex].hinhAnh.filter(
+        (_, i) => i !== value
+      );
+    } else {
+      updatedColorDetails[colorIndex][field] = value;
+    }
+    setColorDetails(updatedColorDetails);
   };
 
-  const handleAddDetail = () => {
-    setDetails([...details, { maKichCo: '', maMau: '', hinhAnh: [], giaThem: 0, tonKho: 0 }]);
+  const handleSizeDetailChange = (colorIndex, sizeIndex, field, value) => {
+    const updatedColorDetails = [...colorDetails];
+    updatedColorDetails[colorIndex].sizes[sizeIndex][field] = value;
+    setColorDetails(updatedColorDetails);
   };
 
-  const handleRemoveDetail = (index) => {
-    if (details.length > 1) {
-      setDetails(details.filter((_, i) => i !== index));
+  const addSizeToColor = (colorIndex) => {
+    const updatedColorDetails = [...colorDetails];
+    updatedColorDetails[colorIndex].sizes.push({ maKichCo: '', giaThem: 0, tonKho: 0 });
+    setColorDetails(updatedColorDetails);
+  };
+
+  const removeSizeFromColor = (colorIndex, sizeIndex) => {
+    const updatedColorDetails = [...colorDetails];
+    if (updatedColorDetails[colorIndex].sizes.length > 1) {
+      updatedColorDetails[colorIndex].sizes = updatedColorDetails[colorIndex].sizes.filter(
+        (_, i) => i !== sizeIndex
+      );
+      setColorDetails(updatedColorDetails);
     }
   };
 
-  const handleDetailChange = (index, field, value) => {
-    const updatedDetails = [...details];
-    updatedDetails[index][field] = value;
-    setDetails(updatedDetails);
+  const addColorDetail = () => {
+    setColorDetails([...colorDetails, { maMau: '', hinhAnh: [], sizes: [{ maKichCo: '', giaThem: 0, tonKho: 0 }] }]);
+  };
+
+  const removeColorDetail = (colorIndex) => {
+    if (colorDetails.length > 1) {
+      setColorDetails(colorDetails.filter((_, i) => i !== colorIndex));
+    }
   };
 
   const handleSubmit = async (e, maDanhMuc) => {
@@ -109,13 +121,15 @@ const useProductAdmin = () => {
         danhMuc: { maDanhMuc: parseInt(maDanhMuc) || 0 },
         khuyenMai: null,
       },
-      chiTietSanPhamDTOs: details.map((d) => ({
-        maKichCo: parseInt(d.maKichCo) || 0,
-        maMau: parseInt(d.maMau) || 0,
-        hinhAnh: d.hinhAnh,
-        giaThem: parseFloat(d.giaThem) || 0,
-        tonKho: parseInt(d.tonKho) || 0,
-      })),
+      chiTietSanPhamDTOs: colorDetails.flatMap((color) =>
+        color.sizes.map((size) => ({
+          maKichCo: parseInt(size.maKichCo) || 0,
+          maMau: parseInt(color.maMau) || 0,
+          hinhAnh: color.hinhAnh,
+          giaThem: parseFloat(size.giaThem) || 0,
+          tonKho: parseInt(size.tonKho) || 0,
+        }))
+      ),
     };
 
     try {
@@ -125,7 +139,7 @@ const useProductAdmin = () => {
       setGiaGoc(0);
       setMoTa('');
       setHinhAnhSanPham([]);
-      setDetails([{ maKichCo: '', maMau: '', hinhAnh: [], giaThem: 0, tonKho: 0 }]);
+      setColorDetails([{ maMau: '', hinhAnh: [], sizes: [{ maKichCo: '', giaThem: 0, tonKho: 0 }] }]);
       navigate('/product');
     } catch (err) {
       setError(err.response?.data?.message || 'Lỗi khi thêm sản phẩm');
@@ -137,7 +151,7 @@ const useProductAdmin = () => {
     setGiaGoc(0);
     setMoTa('');
     setHinhAnhSanPham([]);
-    setDetails([{ maKichCo: '', maMau: '', hinhAnh: [], giaThem: 0, tonKho: 0 }]);
+    setColorDetails([{ maMau: '', hinhAnh: [], sizes: [{ maKichCo: '', giaThem: 0, tonKho: 0 }] }]);
   };
 
   useEffect(() => {
@@ -156,6 +170,7 @@ const useProductAdmin = () => {
     totalPages,
     loading,
     error,
+    setError,
     uploading,
     tenSanPham,
     setTenSanPham,
@@ -164,17 +179,18 @@ const useProductAdmin = () => {
     moTa,
     setMoTa,
     hinhAnhSanPham,
-    details,
+    colorDetails,
     success,
     goToPage,
     deleteProduct,
     handleProductImageChange,
-    handleDetailImageChange,
     removeProductImage,
-    removeDetailImage,
-    handleAddDetail,
-    handleRemoveDetail,
-    handleDetailChange,
+    handleColorDetailChange,
+    handleSizeDetailChange,
+    addSizeToColor,
+    removeSizeFromColor,
+    addColorDetail,
+    removeColorDetail,
     handleSubmit,
     resetForm,
   };

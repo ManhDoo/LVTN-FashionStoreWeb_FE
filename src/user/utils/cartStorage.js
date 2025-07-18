@@ -5,6 +5,7 @@ const getCart = () => {
 
 const saveCart = (cart) => {
   localStorage.setItem('cart', JSON.stringify(cart));
+  window.dispatchEvent(new Event('cartUpdated'));
 };
 
 const addToCart = (item) => {

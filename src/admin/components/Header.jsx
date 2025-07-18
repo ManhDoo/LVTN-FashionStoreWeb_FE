@@ -1,36 +1,20 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
-const Header = ({ pageTitle }) => {
+const Header = ({ pageTitle, onLogout }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   // Giả lập dữ liệu người dùng
   const userName = 'Admin User';
   const userRole = 'Admin';
-  
-
-  const navigate = useNavigate();
-
-  // Hàm xử lý đăng xuất
-  const handleLogout = () => {
-    // Xóa token và thông tin liên quan khỏi localStorage
-    localStorage.removeItem('tokenAdmin');
-    localStorage.removeItem('email');
-    localStorage.removeItem('quyen');
-    localStorage.removeItem('maKhachHang');
-
-    // Chuyển hướng về trang đăng nhập
-    navigate('/admin');
-  };
 
   const toggleFullScreen = () => {
-  if (!document.fullscreenElement) {
-    document.documentElement.requestFullscreen();
-  } else {
-    document.exitFullscreen();
-  }
-};
-
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+    } else {
+      document.exitFullscreen();
+    }
+  };
 
   return (
     <div className="bg-white shadow">
@@ -100,7 +84,7 @@ const Header = ({ pageTitle }) => {
                     <span>Thông tin</span>
                   </Link>
                   <button
-                    onClick={handleLogout}
+                    onClick={onLogout} // Sử dụng prop onLogout
                     className="flex items-center w-full px-4 py-2 text-gray-700 hover:bg-gray-100"
                   >
                     <svg className="w-4 h-4 mr-2 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

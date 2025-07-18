@@ -43,6 +43,8 @@ const useOrderAdmin = () => {
             soDienThoai: order.soDienThoai,
             ngayTao: order.ngayTao,
             trangThai: order.trangThai,
+            mauSac: order.mauSac,
+            kichCo: order.kichCo,
             items: [],
           };
         }
@@ -51,6 +53,8 @@ const useOrderAdmin = () => {
           hinhAnh: order.hinhAnh,
           donGia: order.donGia,
           soLuong: order.soLuong,
+          mauSac: order.mauSac,
+          kichCo: order.kichCo
         });
         return acc;
       }, {});
@@ -84,11 +88,8 @@ const useOrderAdmin = () => {
     }
   };
 
-  const handleStatusSelectChange = (maDonHang, newStatus) => {
-    setStatusUpdates((prev) => ({ ...prev, [maDonHang]: newStatus }));
-  };
 
-  return { orders, loading, error, page, totalPages, goToPage, updateOrderStatus, handleStatusSelectChange };
+  return { orders, loading, error, page, totalPages, goToPage, updateOrderStatus };
 };
 
 export default useOrderAdmin;

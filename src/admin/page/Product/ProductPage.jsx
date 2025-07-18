@@ -129,7 +129,7 @@ const ProductPage = () => {
                       </td>
                       <td className="p-3 text-center">
                         <a
-                          href="#"
+                          href={`/product-edit/${product.maSanPham}`}
                           className="inline-block bg-blue-500 text-white p-2 rounded mr-1 hover:bg-blue-600"
                         >
                           <PencilIcon className="w-4 h-4" />

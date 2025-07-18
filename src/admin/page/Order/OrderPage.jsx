@@ -13,7 +13,7 @@ const statusConfig = {
 };
 
 const OrderPage = () => {
-  const { orders, loading, error, page, totalPages, goToPage, handleStatusSelectChange, updateOrderStatus } = useOrderAdmin();
+  const { orders, loading, error, page, totalPages, goToPage, updateOrderStatus } = useOrderAdmin();
   const [expandedRow, setExpandedRow] = useState(null);
   const [filterDate, setFilterDate] = useState('');
   const [statusUpdates, setStatusUpdates] = useState({});
@@ -42,6 +42,11 @@ const OrderPage = () => {
       alert('Lỗi khi cập nhật trạng thái');
     }
   };
+  const handleStatusSelectChange = (maDonHang, newStatus) => {
+  setStatusUpdates((prev) => ({ ...prev, [maDonHang]: newStatus }));
+};
+
+  
 
 const formatDateVN = (dateStr) => {
   return new Date(dateStr).toLocaleDateString('vi-VN', {
@@ -137,6 +142,8 @@ const filteredOrders = orders
                                     />
                                     <div>
                                       <p><strong>{item.tenSanPham}</strong></p>
+                                      <p>Màu sắc: {item.mauSac}</p>
+                                      <p>Kích cỡ: {item.kichCo}</p>
                                       <p>Số lượng: {item.soLuong}</p>
                                       <p>Đơn giá: {item.donGia.toLocaleString()} VND</p>
                                       <p className="font-semibold">

@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 
 function ProductDetail() {
   const navigate = useNavigate();
-  const { maSanPham } = useParams();
-  const { products, loading, error } = useProductDetail(maSanPham);
+  const { slugWithId } = useParams();
+const maSanPham = slugWithId.split('-').pop(); // tách id từ cuối
+const { products, loading, error } = useProductDetail(maSanPham);
+
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
@@ -103,9 +105,11 @@ function ProductDetail() {
   // Color mapping
   const colorMap = {
     'Đen': 'black',
-    'Xanh': 'blue',
+    'Xanh dương': 'blue',
     'Đỏ': 'red',
     'Vàng': 'yellow',
+    'Trắng': 'white',
+    'Nâu': 'brown'
   };
 
   const handleAddToCart = () => {

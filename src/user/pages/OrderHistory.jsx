@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import useOrderHistory from "../hooks/useOrderHistory";
-import axiosInstance from "../utils/axios";
+import { useNavigate } from "react-router-dom";
 
 const OrderHistory = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -17,6 +17,11 @@ const OrderHistory = () => {
   } = useOrderHistory();
   const [cancelError, setCancelError] = useState(null);
   const [cancelLoading, setCancelLoading] = useState(false);
+    const navigate = useNavigate();
+    const handleProductClick = (maSanPham) => {
+    navigate(`/product/${encodeURIComponent(maSanPham)}`);
+  };
+  
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -24,6 +29,8 @@ const OrderHistory = () => {
         return "bg-red-100 text-red-800 border-red-200";
       case "CHO_XAC_NHAN":
         return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "DA_XAC_NHAN":
+        return "bg-yellow-100 text-yellow-800 border-yellow-500";
       case "DANG_GIAO":
         return "bg-blue-100 text-blue-800 border-blue-200";
       case "DA_GIAO":
@@ -39,6 +46,8 @@ const OrderHistory = () => {
         return "Đã hủy";
       case "CHO_XAC_NHAN":
         return "Chờ xác nhận";
+      case "DA_XAC_NHAN":
+        return "Đã xác nhận";
       case "DANG_GIAO":
         return "Đang giao";
       case "DA_GIAO":
@@ -211,7 +220,7 @@ const OrderHistory = () => {
                     <div className="flex items-center space-x-4">
                       <div>
                         <h3 className="text-lg font-semibold text-gray-800">
-                          Đơn hàng #{order.maDonHang}
+                          Đơn hàng #DH{order.maDonHang}
                         </h3>
                         <p className="text-sm text-gray-600">
                           Ngày đặt: {formatDate(order.ngayTao)}
@@ -224,6 +233,16 @@ const OrderHistory = () => {
                       >
                         {getStatusText(order.trangThai)}
                       </span>
+                      {order.coThanhToan === true && (
+                        <span className="px-3 py-1 rounded-full text-xs font-medium border bg-green-100 text-green-700 border-green-300">
+                          Đã thanh toán
+                        </span>
+                      )}
+                      {order.coYeuCauDoiTra === true && (
+                        <span className="px-3 py-1 rounded-full text-xs font-medium border bg-blue-100 text-blue-700 border-blue-300">
+                          Yêu cầu trả hàng
+                        </span>
+                      )}
                     </div>
                     <div className="mt-2 sm:mt-0 text-right">
                       <p className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
@@ -366,24 +385,63 @@ const OrderHistory = () => {
                       {selectedOrder.items.map((item, index) => (
                         <div
                           key={index}
-                          className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg"
+                          className="flex items-center justify-between space-x-3 p-3 bg-gray-50 rounded-lg cursor-pointer"
+                          onClick={() => handleProductClick(item.maSanPham)}
                         >
-                          <img
-                            src={item.hinhAnh}
-                            alt={item.tenSanPham}
-                            className="w-12 h-12 object-cover rounded-lg"
-                          />
-                          <div className="flex-1">
-                            <p className="font-medium text-sm">
-                              {item.tenSanPham}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              SL: {item.soLuong}
-                            </p>
+                          <div className="flex items-center space-x-3">
+                            <img
+                              src={item.hinhAnh}
+                              alt={item.tenSanPham}
+                              className="w-12 h-12 object-cover rounded-lg"
+                            />
+                            <div>
+                              <p className="font-medium text-sm">
+                                {item.tenSanPham}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                SL: {item.soLuong}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Màu: {item.mauSac}
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Size: {item.kichCo}
+                              </p>
+                            </div>
                           </div>
-                          <span className="font-semibold text-pink-600">
-                            {(item.donGia ?? 0).toLocaleString("vi-VN")} ₫
-                          </span>
+
+                          <div className="flex flex-col items-end space-y-2">
+                            <span className="font-semibold text-pink-600">
+                              {(item.donGia ?? 0).toLocaleString("vi-VN")} ₫
+                            </span>
+
+                            {/* Nút hoàn trả cho từng sản phẩm */}
+                            {["DA_GIAO", "DA_THANH_TOAN"].includes(
+                              selectedOrder.trangThai
+                            ) &&
+                              !item.coYeuCauDoiTra && (
+                                <button
+                                  onClick={() => {
+                                    const query = new URLSearchParams({
+                                      maDonHang: selectedOrder.maDonHang,
+                                      chiTietDonHangId: item.chiTietDonHangId,
+                                      maSanPham: item.maSanPham,
+                                      tenSanPham: item.tenSanPham,
+                                      hinhAnh: item.hinhAnh,
+                                      soLuong: item.soLuong,
+                                      donGia: item.donGia,
+                                      kichCo: item.kichCo,
+                                      mauSac: item.mauSac,
+                                    }).toString();
+
+                                    window.location.href = `/return-request?${query}`;
+                                  }}
+                                  className="px-3 py-1 bg-yellow-400 text-white text-sm rounded hover:bg-yellow-500 cursor-pointer"
+                                >
+                                  Trả hàng
+                                </button>
+                              )}
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -396,20 +454,22 @@ const OrderHistory = () => {
                       </span>
                     </div>
                   </div>
-                  {/* Button: Return/Refund */}
-{['DA_GIAO', 'DA_THANH_TOAN'].includes(selectedOrder.trangThai) && !selectedOrder.coYeuCauDoiTra && (
-  <div className="pt-4">
-    <button
-      onClick={() => {
-        window.location.href = `/return-request/${selectedOrder.maDonHang}`;
-      }}
-      className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-md hover:shadow-lg"
-    >
-      Trả hàng / Hoàn tiền
-    </button>
-  </div>
-)}
-
+                  {/* Button: Return/Refund
+                  {["DA_GIAO", "DA_THANH_TOAN"].includes(
+                    selectedOrder.trangThai
+                  ) &&
+                    !selectedOrder.coYeuCauDoiTra && (
+                      <div className="pt-4">
+                        <button
+                          onClick={() => {
+                            window.location.href = `/return-request/${selectedOrder.maDonHang}`;
+                          }}
+                          className="w-full px-4 py-2 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white font-semibold rounded-lg hover:from-yellow-500 hover:to-yellow-600 transition-all duration-300 shadow-md hover:shadow-lg"
+                        >
+                          Trả hàng / Hoàn tiền
+                        </button>
+                      </div>
+                    )} */}
                 </div>
               </div>
             </div>

@@ -27,7 +27,11 @@ const useOrderHistory = () => {
           soLuong: item.soLuong,
           ngayTao: item.ngayTao,
           ngayGiao: item.ngayGiao,
-          trangThai: item.trangThai
+          trangThai: item.trangThai,
+          mauSac: item.mauSac,
+          kichCo: item.kichCo,
+          coYeuCauDoiTra: item.coYeuCauDoiTra,
+          coThanhToan: item.coThanhToan
         });
         existingOrder.tongGia += item.donGia * item.soLuong;
         existingOrder.tongSoLuong += item.soLuong;
@@ -42,12 +46,17 @@ const useOrderHistory = () => {
           ngayTao: item.ngayTao,
           ngayGiao: item.ngayGiao,
           trangThai: item.trangThai,
+          coThanhToan: item.coThanhToan,
+          coYeuCauDoiTra: item.coYeuCauDoiTra,
           items: [{
+            chiTietDonHangId: item.id,
             maSanPham: item.maSanPham,
             tenSanPham: item.tenSanPham,
             hinhAnh: item.hinhAnh,
             donGia: item.donGia,
-            soLuong: item.soLuong
+            soLuong: item.soLuong,
+            mauSac: item.mauSac,
+            kichCo: item.kichCo
           }]
         });
       }
