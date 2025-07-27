@@ -312,7 +312,7 @@ const ProductEdit = () => {
         {/* Nút lưu và quay lại */}
         <div className="flex justify-between">
           <a
-            href="/products"
+            href="/product"
             className="bg-gray-500 text-white px-4 py-2 rounded-md hover:bg-gray-600"
           >
             Quay lại

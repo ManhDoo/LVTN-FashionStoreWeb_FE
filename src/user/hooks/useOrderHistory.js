@@ -31,7 +31,9 @@ const useOrderHistory = () => {
           mauSac: item.mauSac,
           kichCo: item.kichCo,
           coYeuCauDoiTra: item.coYeuCauDoiTra,
-          coThanhToan: item.coThanhToan
+          coThanhToan: item.coThanhToan,
+          phiGiaoHang: item.phiGiaoHang,
+          tongGia: item.tongGia
         });
         existingOrder.tongGia += item.donGia * item.soLuong;
         existingOrder.tongSoLuong += item.soLuong;
@@ -48,6 +50,8 @@ const useOrderHistory = () => {
           trangThai: item.trangThai,
           coThanhToan: item.coThanhToan,
           coYeuCauDoiTra: item.coYeuCauDoiTra,
+          phiGiaoHang: item.phiGiaoHang,
+          tongGia: item.tongGia,
           items: [{
             chiTietDonHangId: item.id,
             maSanPham: item.maSanPham,

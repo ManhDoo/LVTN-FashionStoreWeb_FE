@@ -29,6 +29,7 @@ const CheckoutPage = () => {
   const [name, setName] = useState("");
   const [address, setAddress] = useState("");
   const [phone, setPhone] = useState("");
+  const [phoneError, setPhoneError] = useState(""); 
   const [provinceName, setProvinceName] = useState("");
   const [districtName, setDistrictName] = useState("");
   const [wardName, setWardName] = useState("");
@@ -77,6 +78,7 @@ const CheckoutPage = () => {
     setName(user.hoTen || "");
     setAddress(user.duong || "");
     setPhone(user.soDienThoai || "");
+    setPhoneError("");
     setProvinceName(user.tinh || "");
     setDistrictName(user.huyen || "");
     setWardName(user.xa || "");
@@ -104,6 +106,7 @@ const CheckoutPage = () => {
       setName("");
       setAddress("");
       setPhone("");
+      setPhoneError(""); 
       setProvinceName("");
       setDistrictName("");
       setWardName("");
@@ -115,12 +118,38 @@ const CheckoutPage = () => {
     }
   };
 
+  const validatePhoneNumber = (phone) => {
+    const phoneRegex = /^(03|05|07|08|09)[0-9]{8}$/;
+
+    if (!phoneRegex.test(phone)) {
+      return "Số điện thoại không hợp lệ";
+    }
+
+    if (/^0+$/.test(phone)) {
+      return "Số điện thoại không hợp lệ";
+    }
+
+    return "";
+  };
+
+  const handlePhoneChange = (e) => {
+    const newPhone = e.target.value;
+    setPhone(newPhone);
+    setPhoneError(validatePhoneNumber(newPhone));
+  };
+
   const totalPrice = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (sum, item) => sum + item.price * item.quantity + shippingFee,
     0
   );
 
   const handlePlaceOrder = async () => {
+    const phoneValidationError = validatePhoneNumber(phone);
+    if (phoneValidationError) {
+      setPhoneError(phoneValidationError);
+      alert(phoneValidationError);
+      return;
+    }
     if (
       !name ||
       !address ||
@@ -474,7 +503,7 @@ const CheckoutPage = () => {
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
                       placeholder="Nhập số điện thoại"
                       value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
+                      onChange={handlePhoneChange}
                     />
                   </div>
                 </div>
@@ -793,7 +822,7 @@ const CheckoutPage = () => {
                 </div>
 
                 {/* Discount Code */}
-                {cart.length > 0 && (
+                {/* {cart.length > 0 && (
                   <div className="mb-6 p-4 bg-yellow-50 rounded-xl border border-yellow-200">
                     <div className="flex items-center space-x-2">
                       <input
@@ -806,7 +835,7 @@ const CheckoutPage = () => {
                       </button>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 {/* Order Summary */}
                 <div className="space-y-4">

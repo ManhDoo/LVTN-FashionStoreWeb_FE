@@ -45,6 +45,8 @@ const useOrderAdmin = () => {
             trangThai: order.trangThai,
             mauSac: order.mauSac,
             kichCo: order.kichCo,
+            coThanhToan: order.coThanhToan,
+            tongGia: order.tongGia,
             items: [],
           };
         }
@@ -54,7 +56,9 @@ const useOrderAdmin = () => {
           donGia: order.donGia,
           soLuong: order.soLuong,
           mauSac: order.mauSac,
-          kichCo: order.kichCo
+          kichCo: order.kichCo,
+          coThanhToan: order.coThanhToan,
+          tongGia: order.tongGia,
         });
         return acc;
       }, {});

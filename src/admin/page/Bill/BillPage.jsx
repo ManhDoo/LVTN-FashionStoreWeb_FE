@@ -22,6 +22,17 @@ const BillPage = () => {
     }
   };
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case "DA_THANH_TOAN":
+        return "Đã thanh toán";
+      case "CHUA_THANH_TOAN":
+        return "Chưa thanh toán";
+      default:
+        return "Không xác định";
+    }
+  };
+
   useEffect(() => {
     fetchBills();
   }, []);
@@ -92,7 +103,7 @@ const BillPage = () => {
                   <th className="p-3 font-bold">Phí giao hàng</th>
                   <th className="p-3 font-bold">Tổng giá</th>
                   <th className="p-3 font-bold">Thành tiền</th>
-                  <th className="p-3 font-bold">Trạng thái</th>
+                  <th className="p-3 font-bold">Thanh toán  </th>
                   <th className="p-3 font-bold">Ngày tạo</th>
                 </tr>
               </thead>
@@ -121,17 +132,17 @@ const BillPage = () => {
                       <td className="p-3">{bill.phiGiaoHang.toLocaleString()}đ</td>
                       <td className="p-3">{bill.tongGia.toLocaleString()}đ</td>
                       <td className="p-3">{bill.thanhTien.toLocaleString()}đ</td>
-                      <td className="p-3">{bill.trangThai}</td>
+                      <td className="p-3">{getStatusText(bill.trangThai)}</td>
                       <td className="p-3">{new Date(bill.ngayTao).toLocaleString()}</td>
                       <td className="p-3">
-  <button
-    onClick={() => navigate(`/bills-create/${bill.maHoaDon}`)}
-    className="text-blue-500 hover:text-blue-700"
-    title="Xem chi tiết"
-  >
-    <EyeIcon className="w-5 h-5" />
-  </button>
-</td>
+                        <button
+                          onClick={() => navigate(`/bills-create/${bill.maHoaDon}`)}
+                          className="text-blue-500 hover:text-blue-700"
+                          title="Xem chi tiết"
+                        >
+                          <EyeIcon className="w-5 h-5" />
+                        </button>
+                      </td>
                     </tr>
                   ))
                 ) : (

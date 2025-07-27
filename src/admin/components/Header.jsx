@@ -3,18 +3,24 @@ import { Link } from 'react-router-dom';
 
 const Header = ({ pageTitle, onLogout }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isFullScreen, setIsFullScreen] = useState(false);
 
   // Giả lập dữ liệu người dùng
-  const userName = 'Admin User';
+  const userName = localStorage.getItem('email');
   const userRole = 'Admin';
 
   const toggleFullScreen = () => {
-    if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen();
-    } else {
-      document.exitFullscreen();
-    }
-  };
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().then(() => {
+      setIsFullScreen(true);
+    });
+  } else {
+    document.exitFullscreen().then(() => {
+      setIsFullScreen(false);
+    });
+  }
+};
+
 
   return (
     <div className="bg-white shadow">
@@ -29,7 +35,7 @@ const Header = ({ pageTitle, onLogout }) => {
           <ul className="flex items-center space-x-4">
             {/* Home Icon */}
             <li>
-              <Link to="/login" className="text-gray-600 hover:text-gray-800">
+              <Link to="/income-page" className="text-gray-600 hover:text-gray-800">
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                 </svg>
@@ -50,15 +56,19 @@ const Header = ({ pageTitle, onLogout }) => {
 
             {/* Fullscreen Icon */}
             <li>
-              <button className="text-gray-600 hover:text-gray-800" onClick={toggleFullScreen}>
-                <svg className="w-5 h-5 block" id="icon-full" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
-                </svg>
-                <svg className="w-5 h-5 hidden" id="icon-minimize" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
-                </svg>
-              </button>
-            </li>
+  <button className="text-gray-600 hover:text-gray-800" onClick={toggleFullScreen}>
+    {isFullScreen ? (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3" />
+      </svg>
+    ) : (
+      <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3" />
+      </svg>
+    )}
+  </button>
+</li>
+
 
             {/* User Profile Dropdown */}
             <li className="relative">

@@ -1,19 +1,36 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import useProductDetail from '../hooks/useProductDetail';
 import { addToCart } from '../utils/cartStorage';
-import { useNavigate } from 'react-router-dom';
+import ImagePopup from '../../admin/utils/ImagePopup';
+import axios from '../utils/axios';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 function ProductDetail() {
   const navigate = useNavigate();
   const { slugWithId } = useParams();
-const maSanPham = slugWithId.split('-').pop(); // tách id từ cuối
-const { products, loading, error } = useProductDetail(maSanPham);
+  const maSanPham = slugWithId.split('-').pop(); // tách id từ cuối
+  const { products, loading, error } = useProductDetail(maSanPham);
+  const [reviews, setReviews] = useState(null);
 
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [variantError, setVariantError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  // Fetch reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await axios.get(`/api/comment/${maSanPham}`);
+        setReviews(response.data);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+      }
+    };
+    fetchReviews();
+  }, [maSanPham]);
 
   // Set default color and size when data is loaded
   useEffect(() => {
@@ -46,6 +63,13 @@ const { products, loading, error } = useProductDetail(maSanPham);
     if (action === 'increase') setQuantity(quantity + 1);
   };
 
+  const scrollToReviews = () => {
+    const reviewSection = document.querySelector('.review-section');
+    if (reviewSection) {
+      reviewSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const handleColorSelect = (color) => {
     setSelectedColor(color);
     const availableSizes = getAvailableSizesForColor(color);
@@ -62,12 +86,19 @@ const { products, loading, error } = useProductDetail(maSanPham);
     }
   };
 
-  if (loading) {
-    return <div>Đang tải...</div>;
-  }
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl);
+  };
 
+  if (loading) return <LoadingSpinner />;
+
+  // ✅ Error
   if (error) {
-    return <div>{error}</div>;
+    return (
+      <div className="text-red-500 text-center py-6">
+        {error}
+      </div>
+    );
   }
 
   if (!products.length) {
@@ -113,29 +144,29 @@ const { products, loading, error } = useProductDetail(maSanPham);
   };
 
   const handleAddToCart = () => {
-  if (selectedVariant) {
-    const cartItem = {
-      id: selectedVariant.id,
-      name: selectedVariant.sanPham.tensp,
-      image: selectedVariant.sanPham.hinhAnh[0],
-      quantity: quantity,
-      color: selectedVariant.mauSac.tenMau,
-      size: selectedVariant.kichCo.tenKichCo,
-      price: finalPrice, // Giá đã giảm (hoặc giá gốc nếu không có khuyến mãi)
-      originalPrice: originalPrice, // Giá gốc
-      khuyenMai: selectedVariant.sanPham.khuyenMai ? {
-        maKhuyenMai: selectedVariant.sanPham.khuyenMai.maKhuyenMai,
-        giaTriGiam: selectedVariant.sanPham.khuyenMai.giaTriGiam,
-        hinhThucGiam: selectedVariant.sanPham.khuyenMai.hinhThucGiam,
-        ngayKetThuc: selectedVariant.sanPham.khuyenMai.ngayKetThuc,
-      } : null,
-    };
+    if (selectedVariant) {
+      const cartItem = {
+        id: selectedVariant.id,
+        name: selectedVariant.sanPham.tensp,
+        image: selectedVariant.sanPham.hinhAnh[0],
+        quantity: quantity,
+        color: selectedVariant.mauSac.tenMau,
+        size: selectedVariant.kichCo.tenKichCo,
+        price: finalPrice,
+        originalPrice: originalPrice,
+        khuyenMai: selectedVariant.sanPham.khuyenMai ? {
+          maKhuyenMai: selectedVariant.sanPham.khuyenMai.maKhuyenMai,
+          giaTriGiam: selectedVariant.sanPham.khuyenMai.giaTriGiam,
+          hinhThucGiam: selectedVariant.sanPham.khuyenMai.hinhThucGiam,
+          ngayKetThuc: selectedVariant.sanPham.khuyenMai.ngayKetThuc,
+        } : null,
+      };
 
-    addToCart(cartItem);
-    console.log('Đã thêm vào giỏ hàng:', cartItem);
-    navigate('/cart');
-  }
-};
+      addToCart(cartItem);
+      console.log('Đã thêm vào giỏ hàng:', cartItem);
+      navigate('/cart');
+    }
+  };
 
   return (
     <div className="bg-gray-100 p-6 mt-10">
@@ -145,8 +176,9 @@ const { products, loading, error } = useProductDetail(maSanPham);
             <img
               key={index}
               src={img}
-              alt={displayProduct.sanPham.tensp}
-              className="w-[300px] h-auto rounded-lg"
+              alt={`${displayProduct.sanPham.tensp} - ${index + 1}`}
+              className="w-[300px] h-auto rounded-lg cursor-pointer hover:opacity-80"
+              onClick={() => handleImageClick(img)}
             />
           ))}
         </div>
@@ -159,6 +191,24 @@ const { products, loading, error } = useProductDetail(maSanPham);
               </span>
             )}
           </div>
+          {reviews && reviews.tongSoDanhGia > 0 && (
+            <div className="flex items-center mb-4">
+              <div className="flex items-center mr-2">
+                {Array(5)
+                  .fill()
+                  .map((_, i) => (
+                    <span
+                      key={i}
+                      className={`text-lg ${i < Math.round(reviews.diemTrungBinh) ? 'text-yellow-400' : 'text-gray-300'}`}
+                    >
+                      ★
+                    </span>
+                  ))}
+              </div>
+              <span className="text-sm text-gray-600 mr-2">({reviews.diemTrungBinh.toFixed(1)})</span>
+              <span className="text-sm text-gray-600 cursor-pointer hover:underline" onClick={scrollToReviews}>| {reviews.tongSoDanhGia} đánh giá</span>
+            </div>
+          )}
           <div className="mb-4">
             {hasPromotion ? (
               <div className="flex items-center">
@@ -250,6 +300,119 @@ const { products, loading, error } = useProductDetail(maSanPham);
           </div>
         </div>
       </div>
+
+      {reviews && reviews.tongSoDanhGia > 0 && (
+        <div className="bg-white rounded-lg shadow-lg max-w-7xl mx-auto mt-6 p-6 review-section">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Đánh giá sản phẩm</h3>
+            <div className="flex space-x-2">
+              <button className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">
+                Viết đánh giá
+              </button>
+              <button className="px-4 py-2 bg-gray-200 rounded-lg text-gray-700 hover:bg-gray-300">
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
+                  <path d="M4 10a6 6 0 1112 0 6 6 0 01-12 0zm6-8a8 8 0 100 16 8 8 0 000-16z" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <div className="flex items-center mb-4">
+                <span className="text-3xl font-bold mr-2">{reviews.diemTrungBinh.toFixed(1)}</span>
+                <div className="flex">
+                  {Array(5)
+                    .fill()
+                    .map((_, i) => (
+                      <span
+                        key={i}
+                        className={`text-xl ${i < Math.round(reviews.diemTrungBinh) ? 'text-yellow-400' : 'text-gray-300'}`}
+                      >
+                        ★
+                      </span>
+                    ))}
+                </div>
+              </div>
+              <p className="text-sm text-gray-600 mb-2">{reviews.tongSoDanhGia} đánh giá</p>
+              <div className="space-y-2">
+                {[5, 4, 3, 2, 1].map((star) => (
+                  <div key={star} className="flex items-center">
+                    <span className="w-6 text-sm">{star} ★</span>
+                    <div className="w-full bg-gray-200 rounded-full h-2.5">
+                      <div
+                        className="bg-yellow-400 h-2.5 rounded-full"
+                        style={{ width: `${(reviews.thongKeSoSao[star] / reviews.tongSoDanhGia) * 100 || 0}%` }}
+                      ></div>
+                    </div>
+                    <span className="w-10 text-sm text-right">{reviews.thongKeSoSao[star]}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div>
+              {reviews.danhSachDanhGia.map((review, index) => (
+                <div key={index} className="border-t pt-4 mt-4 first:mt-0">
+                  <div className="flex items-center mb-2">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center mr-3">
+                      <span className="text-lg font-semibold">{review.hoTenKhachHang.charAt(0)}</span>
+                    </div>
+                    <div>
+                      <p className="font-semibold">{review.hoTenKhachHang}</p>
+                      <p className="text-sm text-gray-500">{new Date(review.ngayDanhGia).toLocaleDateString('vi-VN')}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center mb-2">
+                    {Array(5)
+                      .fill()
+                      .map((_, i) => (
+                        <span
+                          key={i}
+                          className={`text-xl ${i < review.soSao ? 'text-yellow-400' : 'text-gray-300'}`}
+                        >
+                          ★
+                        </span>
+                      ))}
+                  </div>
+                  <p className="text-gray-600 mb-2">{review.noiDung}</p>
+                  <div className="flex space-x-2 mb-2">
+                    {review.hinhAnh.map((img, imgIndex) => (
+                      <img
+                        key={imgIndex}
+                        src={img}
+                        alt={`Product image ${imgIndex}`}
+                        className="h-25 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                        onClick={() => handleImageClick(img)}
+                      />
+                    ))}
+                  </div>
+                  <div className="flex space-x-2 mb-2">
+                    
+                      <img
+                        
+                        src={review.hinhAnhSanPham[0]}
+                        alt={review.tenSanPham}
+                        className="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                        onClick={() => handleImageClick(review.hinhAnhSanPham[0])}
+                      />
+                      <p className="pt-5 text-sm text-gray-500">Sản phẩm: {review.tenSanPham} - {review.mauSac}</p>
+
+                    
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Popup hiển thị ảnh lớn */}
+      {selectedImage && (
+        <ImagePopup
+          imageUrl={selectedImage}
+          onClose={() => setSelectedImage(null)}
+        />
+      )}
     </div>
   );
 }

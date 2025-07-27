@@ -9,6 +9,7 @@ const useProductList = (categoryOrMaDanhMuc) => {
 
   // Hàm lấy danh sách sản phẩm theo danh mục
   const fetchProductsByCategory = async (category) => {
+    setLoading(true);
     try {
       const gender = category === 'FOR MAN' ? 'Nam' : 'Nu';
       const endpoint = `/api/products/phai/${gender}`;

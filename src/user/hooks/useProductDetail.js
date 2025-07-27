@@ -7,6 +7,7 @@ const useProductDetail = (maSanPham) => {
   const [error, setError] = useState(null);
 
   const fetchProductDetails = async (maSanPham) => {
+    setLoading(true);
     try {
       const endpoint = `/api/products/${maSanPham}/details`;
       const response = await axiosInstance.get(endpoint);

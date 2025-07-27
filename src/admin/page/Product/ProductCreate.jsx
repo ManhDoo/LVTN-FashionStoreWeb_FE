@@ -4,6 +4,7 @@ import useProductAdmin from '../../adminHooks/useProductAdmin';
 import useColorAdmin from '../../adminHooks/useColorAdmin';
 import useSizeAdmin from '../../adminHooks/useSizeAdmin';
 import useCategoryAdmin from '../../adminHooks/useCategoryAdmin';
+import LoadingSpinner from '../../../user/components/LoadingSpinner';
 
 const ProductCreate = () => {
   const {
@@ -16,6 +17,7 @@ const ProductCreate = () => {
     hinhAnhSanPham,
     colorDetails,
     success,
+    loading,
     error,
     uploading,
     handleProductImageChange,
@@ -34,6 +36,8 @@ const ProductCreate = () => {
   const { sizes, error: sizeError, loading: sizeLoading } = useSizeAdmin();
   const { danhMucList, error: categoryError, isLoading: categoryLoading } = useCategoryAdmin();
   const [maDanhMuc, setMaDanhMuc] = React.useState('');
+
+   if (loading) return <LoadingSpinner />;
 
   return (
     <div className="container mx-auto p-6 max-w-4xl">

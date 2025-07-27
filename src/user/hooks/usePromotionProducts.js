@@ -8,6 +8,7 @@ const usePromotionProducts = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    setLoading(true);
     const fetchProducts = async () => {
       try {
         const res = await axios.get('/api/promotion/product');

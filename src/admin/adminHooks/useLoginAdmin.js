@@ -19,6 +19,7 @@ const useAdminLogin = () => {
         email: email,
         matKhau: password,
       });
+      await fetchProfile();
 
       // Store the JWT token and other relevant data in localStorage
       localStorage.setItem('tokenAdmin', response.data.jwt);
@@ -27,11 +28,44 @@ const useAdminLogin = () => {
       localStorage.setItem('maKhachHang', response.data.maKhachHang);
 
       // Redirect to CategoryPage on successful login
-      navigate('/category');
+      navigate('/income-page');
     } catch (err) {
       setError(err.response?.data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra email và mật khẩu.');
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchProfile = async () => {
+    const token = localStorage.getItem('tokenAdmin');
+    if (!token) {
+      setError('Không tìm thấy token. Vui lòng đăng nhập lại.');
+      return;
+    }
+
+    try {
+      const response = await axios.get('/api/auth/profile');
+      if (response.status === 200) {
+        // API trả về mảng, lấy phần tử đầu tiên
+        const userData = Array.isArray(response.data) && response.data.length > 0 ? response.data[0] : null;
+        if (userData) {
+          setUser(userData);
+          localStorage.setItem('admin', JSON.stringify(userData));
+        } else {
+          setError('Dữ liệu người dùng không hợp lệ.');
+        }
+      } else {
+        setError(response.data.message || 'Không thể lấy thông tin người dùng');
+      }
+    } catch (error) {
+      console.error('Error fetching profile:', error.response?.data); // Log chi tiết lỗi
+      if (error.response?.status === 400) {
+        setError(error.response?.data?.message || 'Yêu cầu không hợp lệ. Vui lòng kiểm tra lại.');
+      } else {
+        setError(error.response?.data?.message || 'Lỗi khi lấy thông tin người dùng');
+      }
+      localStorage.removeItem('token');
+      localStorage.removeItem('admin');
     }
   };
 
@@ -43,6 +77,7 @@ const useAdminLogin = () => {
     isLoading,
     error,
     handleSubmit,
+    fetchProfile,
   };
 };
 

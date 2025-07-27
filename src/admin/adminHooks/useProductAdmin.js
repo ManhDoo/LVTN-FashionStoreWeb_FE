@@ -132,6 +132,7 @@ const useProductAdmin = () => {
       ),
     };
 
+    setLoading(true);
     try {
       await axiosAdmin.post('/api/products/with-details', payload);
       setSuccess('Thêm sản phẩm thành công!');
@@ -143,6 +144,8 @@ const useProductAdmin = () => {
       navigate('/product');
     } catch (err) {
       setError(err.response?.data?.message || 'Lỗi khi thêm sản phẩm');
+    }finally{
+      setLoading(false);
     }
   };
 

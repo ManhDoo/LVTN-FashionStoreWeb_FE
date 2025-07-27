@@ -15,6 +15,8 @@ const LoginPage = () => {
 
   const [isSliding, setIsSliding] = useState(false);
 
+  
+
   const handleLogin = async (e) => {
     e.preventDefault();
     const success = await login(email, password);
@@ -32,6 +34,10 @@ const LoginPage = () => {
       // Điều hướng đến trang đăng ký
       window.location.href = '/register';
     }, 500); // Delay để hiệu ứng chạy xong
+  };
+
+  const handleGoogleLogin = () => {
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
   };
 
   return (
@@ -89,6 +95,13 @@ const LoginPage = () => {
                 {isLoading ? 'Đang xử lý...' : 'Đăng nhập'}
               </button>
             </form>
+
+             <button
+      onClick={handleGoogleLogin}
+      className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-200"
+    >
+      Đăng nhập bằng Google
+    </button>
 
             <p className="mt-6 text-gray-600 text-sm">
               Nếu bạn chưa có tài khoản, vui lòng{' '}

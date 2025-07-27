@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { PencilIcon, TrashIcon } from '@heroicons/react/24/outline';
 import usePromotionAdmin from '../../adminHooks/usePromotionAdmin';
 import { useNavigate } from 'react-router-dom';
 
 const PromotionPage = () => {
-  const { promotions, error } = usePromotionAdmin();
+  const { promotions,loading, error, deletePromotion } = usePromotionAdmin();
+  const [message, setMessage] = useState(null);
   const navigate = useNavigate();
 
   const formatDateVN = (dateStr) => {
@@ -45,7 +46,16 @@ const PromotionPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {error ? (
+                {loading ? (
+                  <tr>
+                    <td colSpan="6" className="text-center p-12">
+                      <div className="flex flex-col items-center space-y-4">
+                        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+                        <p className="text-gray-600">Đang tải dữ liệu...</p>
+                      </div>
+                    </td>
+                  </tr>
+                ) :error ? (
                   <tr>
                     <td colSpan="9" className="text-center p-4 text-red-500">
                       {error}
@@ -72,11 +82,21 @@ const PromotionPage = () => {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => alert('Xóa chưa được triển khai')}
+                          onClick={async () => {
+                            if (window.confirm("Bạn có chắc chắn muốn xóa khuyến mãi này không?")) {
+                              try {
+                                await deletePromotion(promo.maKhuyenMai);
+                                setMessage("Đã xóa khuyến mãi thành công. Tải lại trang để cập nhật.");
+                              } catch (err) {
+                                setMessage(err.message);
+                              }
+                            }
+                          }}
                           className="inline-block bg-red-500 text-white p-2 rounded hover:bg-red-600"
                         >
                           <TrashIcon className="w-4 h-4" />
                         </button>
+
                       </td>
                     </tr>
                   ))
@@ -88,6 +108,12 @@ const PromotionPage = () => {
                   </tr>
                 )}
               </tbody>
+              {message && (
+  <div className="p-4 text-white bg-yellow-500 rounded-md mb-4">
+    {message}
+  </div>
+)}
+
             </table>
           </div>
         </div>

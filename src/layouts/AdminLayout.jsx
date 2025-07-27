@@ -22,9 +22,14 @@ const AdminLayout = ({ children }) => {
   useEffect(() => {
     const path = location.pathname;
     if (path === '/product') setPageTitle('Danh sách sản phẩm');
+    else if (path === '/product-edit') setPageTitle('Chi tiết sản phẩm');
     else if (path === '/category') setPageTitle('Danh sách danh mục');
     else if (path === '/promotion-page') setPageTitle('Danh sách khuyến mãi');
     else if (path === '/order') setPageTitle('Đơn hàng');
+    else if (path === '/return-request-page') setPageTitle('Đơn hoàn trả');
+    else if (path === '/bills') setPageTitle('Hóa đơn');
+    else if (path === '/bills-create/:id') setPageTitle('Tạo hóa đơn');
+    else if (path === '/income-page') setPageTitle('Thống kê doanh thu');
     else setPageTitle('Dashboard');
   }, [location.pathname]);
 

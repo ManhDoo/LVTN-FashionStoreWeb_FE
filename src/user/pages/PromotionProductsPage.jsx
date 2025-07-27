@@ -2,6 +2,7 @@ import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import usePromotionProducts from "../hooks/usePromotionProducts";
 import { slugify } from "../utils/slugify";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 const PromotionProducts = () => {
   const navigate = useNavigate();
@@ -24,8 +25,16 @@ const PromotionProducts = () => {
       : product.giaGoc - discount;
   };
 
-  if (loading) return <div>Đang tải...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <LoadingSpinner />;
+
+  // ✅ Error
+  if (error) {
+    return (
+      <div className="text-red-500 text-center py-6">
+        {error}
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white p-4 mt-4 relative mt-10">

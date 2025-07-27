@@ -16,6 +16,7 @@ const Sidebar = () => {
   const currentPath = location.pathname;
   const queryParams = new URLSearchParams(location.search);
   const currentStatus = queryParams.get("status") || "";
+  const userName = localStorage.getItem('email');
 
   const toggleMenu = (menu) => {
     setOpenMenus((prev) => ({
@@ -29,6 +30,10 @@ const Sidebar = () => {
     return currentPath === "/order" && currentStatus === status;
   };
 
+  const isStatusActiveReturns = (status) => {
+    return currentPath === "/return-request-page" && currentStatus === status;
+  };
+
   return (
     <div className="fixed top-0 left-0 h-full w-64 bg-white shadow-lg">
       <div className="h-full overflow-y-auto">
@@ -37,9 +42,9 @@ const Sidebar = () => {
           <div className="flex items-center space-x-3">
             <div>
               <h5 className="text-lg font-medium">
-                <span className="font-normal">Chào,</span> John Doe
+                <span className="font-normal">Chào,</span> Admin
               </h5>
-              <p className="text-sm text-gray-600">john.doe@example.com</p>
+              <p className="text-sm text-gray-600">{userName}</p>
             </div>
           </div>
         </div>
@@ -62,11 +67,16 @@ const Sidebar = () => {
             </button>
             {openMenus["overview"] && (
               <ul className="pl-10 text-sm text-gray-600">
-                <li>
-                  <a href="#" className="block p-2 hover:bg-gray-100">
+                <Link
+                    to="/income-page"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/income-page"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
                     Thống kê doanh thu
-                  </a>
-                </li>
+                  </Link>
               </ul>
             )}
           </li>
@@ -239,9 +249,16 @@ const Sidebar = () => {
                   </Link>
                 </li>
                 <li>
-                  <a href="#" className="block p-2 hover:bg-gray-100">
+                  <Link
+                    to="/promotion-products"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/promotion-products"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
                     Sản phẩm khuyến mãi
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="block p-2 hover:bg-gray-100">
@@ -280,16 +297,23 @@ const Sidebar = () => {
                     Danh sách đơn hoàn trả
                   </Link>
                 </li>
-                <li>
-                  <a href="#" className="block p-2 hover:bg-gray-100">
+                {/* <li>
+                  <Link
+                    to="/return-request-page?trangThai=CHO_XAC_NHAN"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      isStatusActiveReturns("CHO_XAC_NHAN")
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
                     Chưa giải quyết
-                  </a>
+                  </Link>
                 </li>
                 <li>
                   <a href="#" className="block p-2 hover:bg-gray-100">
                     Đã xác nhận
                   </a>
-                </li>
+                </li> */}
               </ul>
             )}
           </li>
@@ -321,16 +345,6 @@ const Sidebar = () => {
                   >
                     Danh sách hóa đơn
                   </Link>
-                </li>
-                <li>
-                  <a href="#" className="block p-2 hover:bg-gray-100">
-                    Chưa giải quyết
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="block p-2 hover:bg-gray-100">
-                    Đã xác nhận
-                  </a>
                 </li>
               </ul>
             )}
