@@ -163,7 +163,6 @@ function ProductDetail() {
       };
 
       addToCart(cartItem);
-      console.log('Đã thêm vào giỏ hàng:', cartItem);
       navigate('/cart');
     }
   };

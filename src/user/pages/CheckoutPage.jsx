@@ -182,14 +182,15 @@ const CheckoutPage = () => {
         (method) => method.maPTThanhToan === paymentMethod
       );
 
-      if (selectedPaymentMethod.tenPhuongThuc.toLowerCase() === "vnpay") {
-        // Nếu là VNPay, chuyển hướng đến URL thanh toán
+      if (!isAuthenticated && selectedPaymentMethod.tenPhuongThuc.toLowerCase() === "cod") {
+        alert("Bạn cần đăng nhập để thanh toán bằng COD!");
+        return;
+      }
+
+      if (["vnpay", "momo"].includes(selectedPaymentMethod.tenPhuongThuc.toLowerCase())) {
         window.location.href = response;
-      } else {
-        // Xử lý các phương thức thanh toán khác (như COD)
+      } else {  
         alert("Đơn hàng đã được đặt thành công!");
-        // localStorage.removeItem("cart");
-        // setCart([]);
         navigate("/");
       }
     } catch (error) {
