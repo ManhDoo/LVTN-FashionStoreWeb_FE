@@ -18,5 +18,9 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ''),
       },
     },
+    
   },
+  define: {
+    global: 'globalThis', // Thêm dòng này để định nghĩa global
+  }
 })

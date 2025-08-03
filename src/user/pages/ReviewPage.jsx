@@ -73,7 +73,7 @@ const ReviewForm = () => {
               Đánh Giá Sản Phẩm
             </h1>
             <button
-              onClick={() => navigate("/order-history")}
+              onClick={() => navigate("/orders")}
               className="p-2 hover:bg-gray-100 rounded-full"
             >
               <svg

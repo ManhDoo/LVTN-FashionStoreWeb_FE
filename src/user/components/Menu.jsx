@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import useCategoryStore from "../hooks/useCategoryStore";
+import useScrollVisibility from "./ScrollVisibility";
 import { slugify } from "../utils/slugify";
 
 const Menu = () => {
@@ -9,8 +10,7 @@ const Menu = () => {
   const [hoverGender, setHoverGender] = useState(null);
   const [showPopup, setShowPopup] = useState(false);
   const { categories } = useCategoryStore(hoverGender);
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const lastScrollY = useRef(0);
+  const isHeaderVisible = useScrollVisibility(80);
   const timeoutRef = useRef(null);
 
   const menuItems = [
@@ -65,22 +65,7 @@ const Menu = () => {
   };
 
   useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
-        setIsHeaderVisible(false);
-      } else {
-        setIsHeaderVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
     return () => {
-      window.removeEventListener("scroll", handleScroll);
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current);
       }
@@ -89,8 +74,8 @@ const Menu = () => {
 
   return (
     <nav
-      className={`fixed w-full bg-white shadow-md border-b border-pink-100/50 mt-19 z-99 transition-transform duration-300 ${
-        isHeaderVisible ? "translate-y-0" : "-translate-y-full"
+      className={`fixed w-full bg-white shadow-md border-b border-pink-100/50 z-[999] transition-transform duration-300 ${
+        isHeaderVisible ? "top-[76px] translate-y-0" : "top-0 -translate-y-full"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

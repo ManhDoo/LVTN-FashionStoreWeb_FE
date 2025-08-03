@@ -112,7 +112,6 @@ const ReturnRequestPageAdmin = () => {
 
   const statusOptions = [
     { value: "DA_XAC_NHAN", label: "Đã xác nhận" },
-    { value: "TU_CHOI", label: "Từ chối" },
     { value: "DANG_XU_LY", label: "Đang xử lý" },
     { value: "HOAN_THANH", label: "Hoàn thành" },
   ];

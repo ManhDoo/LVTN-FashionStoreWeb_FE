@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 
 const useProductAdmin = () => {
   const [products, setProducts] = useState([]);
+  const [productsIsDeleted, setProductsIsDeleted] = useState([]);
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -26,7 +27,29 @@ const useProductAdmin = () => {
     try {
       setLoading(true);
       const res = await axiosAdmin.get(`/api/products?page=${currentPage}`);
-      setProducts(res.data.content);
+
+      // Lọc sản phẩm không bị xóa và không bị ẩn
+      const filteredProducts = res.data.content.filter(
+        (product) => !product.deleted
+      );
+
+      setProducts(filteredProducts);
+      setTotalPages(res.data.totalPages);
+      setPage(res.data.number);
+      setError(null);
+    } catch (err) {
+      setError(err.message || 'Lỗi khi tải danh sách sản phẩm');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchProductsIsDeletd = async (currentPage = 0) => {
+    try {
+      setLoading(true);
+      const res = await axiosAdmin.get(`/api/products/is-deleted?page=${currentPage}`);
+
+      setProductsIsDeleted(res.data.content);
       setTotalPages(res.data.totalPages);
       setPage(res.data.number);
       setError(null);
@@ -159,6 +182,7 @@ const useProductAdmin = () => {
 
   useEffect(() => {
     fetchProducts(page);
+    fetchProductsIsDeletd(page);
   }, [page]);
 
   const goToPage = (newPage) => {
@@ -169,6 +193,7 @@ const useProductAdmin = () => {
 
   return {
     products,
+    productsIsDeleted,
     page,
     totalPages,
     loading,

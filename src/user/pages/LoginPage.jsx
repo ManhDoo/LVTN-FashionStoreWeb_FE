@@ -97,11 +97,17 @@ const LoginPage = () => {
             </form>
 
              <button
-      onClick={handleGoogleLogin}
-      className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-200"
-    >
-      Đăng nhập bằng Google
-    </button>
+              onClick={handleGoogleLogin}
+              className="w-full bg-blue-500 text-white py-3 rounded hover:bg-blue-600 transition duration-200"
+            >
+              Đăng nhập bằng Google
+            </button>
+            <p className="mt-4 text-center">
+  <Link to="/forgot-password" className="text-blue-500 hover:underline text-sm">
+    Quên mật khẩu?
+  </Link>
+</p>
+
 
             <p className="mt-6 text-gray-600 text-sm">
               Nếu bạn chưa có tài khoản, vui lòng{' '}

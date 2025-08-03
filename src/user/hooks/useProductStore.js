@@ -14,7 +14,12 @@ const useProductList = (categoryOrMaDanhMuc) => {
       const gender = category === 'FOR MAN' ? 'Nam' : 'Nu';
       const endpoint = `/api/products/phai/${gender}`;
       const response = await axiosInstance.get(endpoint);
-      setProducts(response.data);
+
+      const filteredProducts = response.data.filter(
+        (product) => !product.deleted
+      );
+
+      setProducts(filteredProducts);
       if (response.data.length > 0) {
       setCategoryInfo(response.data[0].danhMuc); // <-- Lấy tendm
     }

@@ -1,43 +1,51 @@
-import React, { useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import useProductStore from "../hooks/useProductStore";
-import { slugify } from "../utils/slugify";
-import useFavorite from "../hooks/useFavoriteItems";
 import { Heart } from "lucide-react";
+import useFavorite from "../hooks/useFavoriteItems";
+import { slugify } from "../utils/slugify";
 import LoadingSpinner from "./LoadingSpinner";
+import axios from "../utils/axios";
 
-const ProductSection = ({ category }) => {
-  const { products, loading, error } = useProductStore(category);
+const TopSellingSection = () => {
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const { favoriteIds, addToFavorite, removeFromFavorite } = useFavorite();
-  const navigate = useNavigate();
   const scrollRef = useRef();
+  const navigate = useNavigate();
+
+useEffect(() => {
+  const fetchTopSelling = async () => {
+    try {
+      const res = await axios.get("/api/products/top-selling");
+
+      const filteredProducts = res.data.content.filter(
+        (product) => !product.deleted
+      );
+
+      setProducts(filteredProducts);
+    } catch (err) {
+      console.error("Lỗi lấy sản phẩm bán chạy:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  fetchTopSelling();
+}, []);
 
   const scrollLeft = () => {
     scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
   };
-
   const scrollRight = () => {
     scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
   };
 
-  if (loading) return <LoadingSpinner />;
-
-  // ✅ Error
-  if (error) {
-    return (
-      <div className="text-red-500 text-center py-6">
-        {error}
-      </div>
-    );
-  }
-
-    const isNewProduct = (ngayTao) => {
-  const createdDate = new Date(ngayTao);
-  const now = new Date();
-  const diffInMs = now - createdDate;
-  const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
-  return diffInDays <= 7;
-};
+  const isNewProduct = (ngayTao) => {
+    const createdDate = new Date(ngayTao);
+    const now = new Date();
+    const diffInMs = now - createdDate;
+    const diffInDays = diffInMs / (1000 * 60 * 60 * 24);
+    return diffInDays <= 7;
+  };
 
   const calculateDiscountedPrice = (product) => {
     if (
@@ -47,7 +55,6 @@ const ProductSection = ({ category }) => {
     ) {
       return null;
     }
-
     const discount = product.khuyenMai.giaTriGiam;
     if (product.khuyenMai.hinhThucGiam === "Phần trăm") {
       return product.giaGoc * (1 - discount / 100);
@@ -55,16 +62,12 @@ const ProductSection = ({ category }) => {
     return product.giaGoc - discount;
   };
 
+  if (loading) return <LoadingSpinner />;
+
   return (
-    <div className="bg-white p-4 mt-4 relative">
+    <div className="bg-gray p-4 mt-4 relative">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold">{category}</h2>
-        <a
-          href={`/gender/${encodeURIComponent(category)}`}
-          className="text-blue-500 hover:underline"
-        >
-          Xem tất cả
-        </a>
+        <h2 className="text-2xl font-bold">BEST SELLER</h2>
       </div>
 
       <div className="relative">
@@ -120,17 +123,15 @@ const ProductSection = ({ category }) => {
                   </div>
                 </div>
 
-                {/* ❤️ Nút yêu thích */}
                 <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (isFavorite) {
-                        removeFromFavorite(product.maSanPham);
-                      } else {
-                        addToFavorite(product.maSanPham);
-                      }
-                    }}
-
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (isFavorite) {
+                      removeFromFavorite(product.maSanPham);
+                    } else {
+                      addToFavorite(product.maSanPham);
+                    }
+                  }}
                   className="absolute top-2 left-2 bg-white p-2 rounded-full shadow hover:bg-red-100 z-10"
                 >
                   <Heart
@@ -139,11 +140,13 @@ const ProductSection = ({ category }) => {
                     }`}
                   />
                 </button>
+
                 {isNewProduct(product.ngayTao) && (
                   <span className="absolute top-2 left-12 bg-green-500 text-white px-2 py-1 rounded-full text-sm z-10">
                     Mới
                   </span>
                 )}
+
                 <p className="font-bold mt-2 truncate whitespace-nowrap overflow-hidden">
                   {product.tensp}
                 </p>
@@ -172,4 +175,4 @@ const ProductSection = ({ category }) => {
   );
 };
 
-export default ProductSection;
+export default TopSellingSection;

@@ -12,7 +12,7 @@ const OAuth2Success = () => {
 
     if (token) {
       localStorage.setItem('token', token);
-      window.location.href = '/'; // Hoặc navigate('/')
+      window.location.href = '/';
     } else {
       alert('Đăng nhập Google thất bại!');
       navigate('/login');

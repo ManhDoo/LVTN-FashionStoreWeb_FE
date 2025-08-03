@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   HomeIcon,
   ShoppingBagIcon,
@@ -6,12 +6,16 @@ import {
   BriefcaseIcon,
   TagIcon,
   ArrowPathIcon,
-  BanknotesIcon
+  BanknotesIcon,
+  ChatBubbleBottomCenterTextIcon
 } from "@heroicons/react/24/outline";
 import { useLocation, Link } from "react-router-dom";
+import SockJS from "sockjs-client";
+import Stomp from "stompjs";
 
 const Sidebar = () => {
   const [openMenus, setOpenMenus] = useState({});
+  const [newOrderCount, setNewOrderCount] = useState(0);
   const location = useLocation();
   const currentPath = location.pathname;
   const queryParams = new URLSearchParams(location.search);
@@ -24,6 +28,38 @@ const Sidebar = () => {
       [menu]: !prev[menu],
     }));
   };
+
+  useEffect(() => {
+    const socket = new SockJS("http://localhost:8080/ws");
+    const stompClient = Stomp.over(socket);
+
+    // Thêm xử lý lỗi khi kết nối
+    stompClient.connect(
+      {},
+      (frame) => {
+        // console.log("Connected: " + frame);
+        // Subscribe chỉ khi kết nối thành công
+        stompClient.subscribe("/topic/newOrder", (message) => {
+          const orderId = message.body;
+          // console.log("New order received: ", orderId);
+          setNewOrderCount((prev) => prev + 1);
+        });
+      },
+      (error) => {
+        console.error("WebSocket connection error: ", error);
+        // Có thể hiển thị thông báo lỗi cho người dùng nếu cần
+      }
+    );
+
+    // Cleanup khi component unmount
+    return () => {
+      if (stompClient && stompClient.connected) {
+        stompClient.disconnect(() => {
+          console.log("Disconnected from WebSocket");
+        });
+      }
+    };
+  }, []);
 
   // Helper function to check if a status link is active
   const isStatusActive = (status) => {
@@ -124,6 +160,18 @@ const Sidebar = () => {
                     Danh sách sản phẩm
                   </Link>
                 </li>
+                <li>
+                  <Link
+                    to="/product-deleted"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/product-deleted"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
+                    Sản phẩm đã xóa
+                  </Link>
+                </li>
               </ul>
             )}
           </li>
@@ -136,6 +184,11 @@ const Sidebar = () => {
             >
               <ShoppingBagIcon className="w-6 h-6 mr-3" />
               <span>Đơn hàng</span>
+              {newOrderCount > 0 && (
+                <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                  {newOrderCount}
+                </span>
+              )}
               <ChevronRightIcon
                 className={`w-4 h-4 ml-auto transform ${
                   openMenus["orders"] ? "rotate-90" : ""
@@ -154,6 +207,11 @@ const Sidebar = () => {
                     }`}
                   >
                     Danh sách đơn hàng
+                    {newOrderCount > 0 && (
+                      <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full px-2 py-1">
+                        {newOrderCount}
+                      </span>
+                    )}
                   </Link>
                 </li>
                 <li>
@@ -344,6 +402,38 @@ const Sidebar = () => {
                     }`}
                   >
                     Danh sách hóa đơn
+                  </Link>
+                </li>
+              </ul>
+            )}
+          </li>
+
+          {/* Đánh giá */}
+          <li className="mt-2">
+            <button
+              onClick={() => toggleMenu("reviews")}
+              className="flex items-center w-full p-3 text-gray-700 hover:bg-gray-100"
+            >
+              <ChatBubbleBottomCenterTextIcon className="w-6 h-6 mr-3" />
+              <span>Đánh giá</span>
+              <ChevronRightIcon
+                className={`w-4 h-4 ml-auto transform ${
+                  openMenus["reviews"] ? "rotate-90" : ""
+                }`}
+              />
+            </button>
+            {openMenus["reviews"] && (
+              <ul className="pl-10 text-sm text-gray-600">
+                <li>
+                 <Link
+                    to="/review-page"
+                    className={`block p-2 rounded hover:bg-gray-100 ${
+                      currentPath === "/review-page"
+                        ? "bg-blue-100 text-blue-600 font-semibold"
+                        : ""
+                    }`}
+                  >
+                    Đánh giá chưa duyệt
                   </Link>
                 </li>
               </ul>

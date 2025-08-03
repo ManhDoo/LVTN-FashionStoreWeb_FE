@@ -117,7 +117,7 @@ const Footer = () => {
                   </div>
                   <div>
                     <p className="text-gray-300 text-sm">
-                      123 Lê Lợi, Quận 1<br />
+                      180 Cao Lỗ, Phường 4, Quận 8<br />
                       TP. Hồ Chí Minh, Việt Nam
                     </p>
                   </div>
@@ -127,14 +127,14 @@ const Footer = () => {
                   <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-blue-500 rounded-lg flex items-center justify-center">
                     <Phone size={16} className="text-white" />
                   </div>
-                  <p className="text-gray-300 text-sm">0123 456 789</p>
+                  <p className="text-gray-300 text-sm">0326 888 888</p>
                 </div>
 
                 <div className="flex items-center space-x-3">
                   <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
                     <Mail size={16} className="text-white" />
                   </div>
-                  <p className="text-gray-300 text-sm">fashion@example.com</p>
+                  <p className="text-gray-300 text-sm">dh52111288@student.stu.edu.vn</p>
                 </div>
 
                 <div className="flex items-center space-x-3">

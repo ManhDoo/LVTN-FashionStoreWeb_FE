@@ -18,7 +18,8 @@ const UserLayout = ({ children }) => {
     <div className="min-h-screen bg-gray-100 w-full">
       <Header />
       <Menu />
-      <div className="pt-30">
+      {/* Updated margin top to account for both Header (76px) and Menu (~60px) */}
+      <div className="pt-[140px]">
         {children}
       </div>
       <Footer />

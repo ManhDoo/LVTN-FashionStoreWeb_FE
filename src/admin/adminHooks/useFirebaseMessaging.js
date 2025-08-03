@@ -12,7 +12,7 @@ const useFirebaseMessaging = () => {
         token: fcmToken,
         topic: 'admin_notifications',
       });
-      console.log('Đã đăng ký topic admin_notifications');
+      // console.log('Đã đăng ký topic admin_notifications');
     } catch (err) {
       console.error('Lỗi khi đăng ký topic:', err);
     }
@@ -25,7 +25,7 @@ const useFirebaseMessaging = () => {
         token: fcmToken,
         topic: 'admin_notifications',
       });
-      console.log('Đã hủy đăng ký topic admin_notifications');
+      // console.log('Đã hủy đăng ký topic admin_notifications');
     } catch (err) {
       console.error('Lỗi khi hủy đăng ký topic:', err);
     }
@@ -40,7 +40,7 @@ const useFirebaseMessaging = () => {
       // Yêu cầu quyền thông báo
       Notification.requestPermission().then((permission) => {
         if (permission === 'granted') {
-          console.log('Đã cấp quyền thông báo.');
+          // console.log('Đã cấp quyền thông báo.');
           // Lấy token FCM
           getToken(messaging, {
             vapidKey: 'BIv5iLeGe5sXTwvxdThtVPNXozXvlavEe0qAyaEaAszI4Sv7yh1utLqH0aqFtiQcEzICWJKqnzDxEYm88NCXqN4',
@@ -48,7 +48,7 @@ const useFirebaseMessaging = () => {
             .then((currentToken) => {
               if (currentToken) {
                 setToken(currentToken);
-                console.log('FCM Token:', currentToken);
+                // console.log('FCM Token:', currentToken);
                 // Đăng ký topic nếu admin đã đăng nhập
                 subscribeToTopic(currentToken);
               } else {
@@ -63,7 +63,7 @@ const useFirebaseMessaging = () => {
 
       // Lắng nghe thông báo foreground
       onMessage(messaging, (payload) => {
-        console.log('Thông báo foreground nhận được:', payload);
+        // console.log('Thông báo foreground nhận được:', payload);
         const notificationTitle = payload.notification.title;
         const notificationOptions = {
           body: payload.notification.body,

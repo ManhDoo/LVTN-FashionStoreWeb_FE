@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "../hooks/useAuthStore";
+import useScrollVisibility from "./ScrollVisibility";
 import logo from "../../assets/images/logoStore.png";
 import { getCart } from "../utils/cartStorage";
 import { searchProducts } from "../hooks/useSearchProduct";
@@ -18,8 +19,7 @@ const Header = () => {
   const [isLoading, setIsLoading] = useState(false);
   const popupRef = useRef();
   const navigate = useNavigate();
-  const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-  const lastScrollY = useRef(0);
+  const isHeaderVisible = useScrollVisibility(80);
   const { favoriteIds, addToFavorite, removeFromFavorite } = useFavorite();
 
   useEffect(() => {
@@ -81,24 +81,6 @@ const Header = () => {
     };
   }, []);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-
-      if (currentScrollY > lastScrollY.current && currentScrollY > 80) {
-        setIsHeaderVisible(false);
-      } else {
-        setIsHeaderVisible(true);
-      }
-
-      lastScrollY.current = currentScrollY;
-    };
-
-    window.addEventListener("scroll", handleScroll);
-
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
   const handleUserClick = () => {
     setShowLogout(!showLogout);
   };
@@ -115,7 +97,7 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed bg-white w-full top-0 z-9999 transition-transform duration-300 ${
+      className={`fixed bg-white w-full top-0 z-[9999] transition-transform duration-300 ${
         isHeaderVisible ? "translate-y-0" : "-translate-y-full"
       }`}
     >

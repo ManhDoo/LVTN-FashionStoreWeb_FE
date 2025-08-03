@@ -30,6 +30,7 @@ const AdminLayout = ({ children }) => {
     else if (path === '/bills') setPageTitle('Hóa đơn');
     else if (path === '/bills-create/:id') setPageTitle('Tạo hóa đơn');
     else if (path === '/income-page') setPageTitle('Thống kê doanh thu');
+    else if (path === '/review-page') setPageTitle('Đánh giá');
     else setPageTitle('Dashboard');
   }, [location.pathname]);
 

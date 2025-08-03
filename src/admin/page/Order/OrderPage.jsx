@@ -31,7 +31,7 @@ const statusConfig = {
     textColor: 'text-green-800',
     borderColor: 'border-green-200',
     iconColor: 'text-green-500'
-  },
+  },  
   DA_HUY: { 
     label: 'Đã hủy', 
     bgColor: 'bg-gradient-to-r from-red-50 to-red-100', 

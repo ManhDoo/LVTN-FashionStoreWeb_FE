@@ -10,6 +10,7 @@ import CartPage from './user/pages/Cart';
 import CheckoutPage from "./user/pages/Checkout/CheckoutPage";
 import LoginPage from './user/pages/LoginPage';
 import RegisterPage from "./user/pages/RegisterPage";
+import ForgotPasswordPage from "./user/pages/ForgotPasswordPage";
 import UserProfile from "./user/pages/UserProfile";
 import AllProducts from './user/pages/AllProducts';
 import OrderHistory from './user/pages/OrderHistory';
@@ -20,8 +21,9 @@ import PaymentFailurePage from "./user/pages/PaymentFailurePage";
 import PromotionProductsPage from "./user/pages/PromotionProductsPage";
 import ProductsByCategoryPage from "./user/pages/ProductsByCategoryPage";
 import ProductsByGenderPage from "./user/pages/ProductsByGenderPage";
+import TopSellingSection from "./user/components/TopSellingSection";
 import ListReturnRequestPage from "./user/pages/ListReturnRequestsPage";
-import ReviewForm from "./user/pages/Reviewpage";
+import ReviewForm from "./user/pages/ReviewPage";
 import FavoritePage from "./user/pages/FavoritePage";
 import OAuth2Success from "./user/pages/OAuth2Success";
 import GoogleCallback from "./user/components/GoogleCallback";
@@ -32,6 +34,7 @@ import CategoryCreate from "./admin/page/Category/CategoryCreate";
 import CategoryEdit from "./admin/page/Category/CategoryEdit";
 
 import ProductPage from "./admin/page/Product/ProductPage";
+import ProductIsDeletedPage from "./admin/page/Product/ProductIsDeletedPage";
 import ProductCreate from "./admin/page/Product/ProductCreate";
 import ProductEdit from "./admin/page/Product/ProductEdit";
 
@@ -46,6 +49,8 @@ import BillPage from "./admin/page/Bill/BillPage";
 import BillCreate from "./admin/page/Bill/BillCreate";
 
 import IncomePage from "./admin/page/Income/IncomePage";
+
+import PendingReviewsPage from "./admin/page/Review/PendingReviewsPage";
 
 import OrderPage from "./admin/page/Order/OrderPage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
@@ -62,7 +67,9 @@ function App() {
             <>
               <Banner />
               <ProductSection category="FOR MAN" />
+              <TopSellingSection />
               <ProductSection category="FOR WOMEN" />
+              
             </>
           </UserLayout>
         }
@@ -90,6 +97,10 @@ function App() {
       <Route
         path="/register"
         element={<UserLayout><RegisterPage /></UserLayout>}
+      />
+      <Route
+        path="/forgot-password"
+        element={<UserLayout><ForgotPasswordPage /></UserLayout>}
       />
       <Route
         path="/profile"
@@ -163,6 +174,10 @@ function App() {
         element={<AdminLayout><ProductPage /></AdminLayout>}
       />
       <Route
+        path="/product-deleted"
+        element={<AdminLayout><ProductIsDeletedPage /></AdminLayout>}
+      />
+      <Route
         path="/product-create"
         element={<AdminLayout><ProductCreate /></AdminLayout>}
       />
@@ -213,6 +228,10 @@ function App() {
       <Route
         path="/income-page"
         element={<AdminLayout><IncomePage /></AdminLayout>}
+      />
+      <Route
+        path="/review-page"
+        element={<AdminLayout><PendingReviewsPage /></AdminLayout>}
       />
       
     </Routes>
