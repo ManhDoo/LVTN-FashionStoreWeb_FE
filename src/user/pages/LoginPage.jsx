@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import useAuthStore from '../hooks/useAuthStore';
+import back from "../../assets/images/back.jpg";
 
 const LoginPage = () => {
   const {
@@ -51,7 +52,7 @@ const LoginPage = () => {
         >
           <img
             className="w-full h-full object-cover"
-            src="src/assets/images/back.jpg"
+            src={back}
             alt="Background"
           />
         </div>
