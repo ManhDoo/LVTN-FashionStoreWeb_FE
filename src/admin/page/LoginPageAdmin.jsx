@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAdminLogin from '../adminHooks/useLoginAdmin';
+import back from "../../assets/images/back.jpg";
 
 const LoginPageAdmin = () => {
   const { email, setEmail, password, setPassword, isLoading, error, handleSubmit } = useAdminLogin();
@@ -24,7 +25,7 @@ const LoginPageAdmin = () => {
         >
           <img
             className="w-full h-full object-cover"
-            src="src/assets/images/back.jpg"
+            src={back}
             alt="Background"
           />
         </div>
