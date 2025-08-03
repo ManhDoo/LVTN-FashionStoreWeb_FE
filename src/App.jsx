@@ -15,7 +15,7 @@ import UserProfile from "./user/pages/UserProfile";
 import AllProducts from './user/pages/AllProducts';
 import OrderHistory from './user/pages/OrderHistory';
 import ReturnRequestPage from "./user/pages/ReturnRequestPage";
-import VNPayReturnPage from './user/pages/VNPayReturnPage.JSX';
+import VNPayReturnPage from "./user/pages/VNPayReturnPage";
 import PaymentSuccessPage from './user/pages/PaymentSuccessPage';
 import PaymentFailurePage from "./user/pages/PaymentFailurePage";
 import PromotionProductsPage from "./user/pages/PromotionProductsPage";
