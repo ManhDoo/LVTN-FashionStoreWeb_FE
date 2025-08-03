@@ -30,7 +30,7 @@ const Sidebar = () => {
   };
 
   useEffect(() => {
-    const socket = new SockJS("http://localhost:8080/ws");
+    const socket = new SockJS("https://lvtn-fashionstoreweb.onrender.com/ws");
     const stompClient = Stomp.over(socket);
 
     // Thêm xử lý lỗi khi kết nối

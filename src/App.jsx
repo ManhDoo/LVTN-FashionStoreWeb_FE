@@ -54,10 +54,22 @@ import PendingReviewsPage from "./admin/page/Review/PendingReviewsPage";
 
 import OrderPage from "./admin/page/Order/OrderPage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
+// Tạo QueryClient
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60 * 1000, // Dữ liệu được coi là "tươi" trong 5 phút
+      cacheTime: 30 * 60 * 1000, // Dữ liệu được lưu trong cache 30 phút
+    },
+  },
+});
 
 function App() {
   return (
     <GoogleOAuthProvider clientId="94927206041-3l978h272hnvum2nk8uo9k7ib7vqrb9i.apps.googleusercontent.com">
+      <QueryClientProvider client={queryClient}>
     <Routes>
       {/* Layout cho user */}
       <Route
@@ -235,6 +247,7 @@ function App() {
       />
       
     </Routes>
+    </QueryClientProvider>
     </GoogleOAuthProvider>
   );
 }

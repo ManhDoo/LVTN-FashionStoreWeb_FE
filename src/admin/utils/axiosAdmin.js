@@ -2,8 +2,8 @@
 import axios from 'axios';
 
 const axiosAdmin = axios.create({
-  baseURL: 'http://localhost:8080',
-  // baseURL: 'https://lvtn-fashionstoreweb.onrender.com',
+  // baseURL: 'http://localhost:8080',
+  baseURL: 'https://lvtn-fashionstoreweb.onrender.com',
 });
 
 axiosAdmin.interceptors.request.use(

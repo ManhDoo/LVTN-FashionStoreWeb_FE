@@ -3,34 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import useProductDetail from '../hooks/useProductDetail';
 import { addToCart } from '../utils/cartStorage';
 import ImagePopup from '../../admin/utils/ImagePopup';
-import axios from '../utils/axios';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 function ProductDetail() {
   const navigate = useNavigate();
   const { slugWithId } = useParams();
-  const maSanPham = slugWithId.split('-').pop(); // tách id từ cuối
-  const { products, loading, error } = useProductDetail(maSanPham);
-  const [reviews, setReviews] = useState(null);
-
+  const maSanPham = slugWithId.split('-').pop(); // Tách id từ cuối
+  const { products, reviews, loading, error, refetch } = useProductDetail(maSanPham);
   const [selectedColor, setSelectedColor] = useState(null);
   const [selectedSize, setSelectedSize] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [variantError, setVariantError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
-
-  // Fetch reviews
-  useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        const response = await axios.get(`/api/comment/${maSanPham}`);
-        setReviews(response.data);
-      } catch (err) {
-        console.error('Error fetching reviews:', err);
-      }
-    };
-    fetchReviews();
-  }, [maSanPham]);
 
   // Set default color and size when data is loaded
   useEffect(() => {
@@ -92,11 +76,16 @@ function ProductDetail() {
 
   if (loading) return <LoadingSpinner />;
 
-  // ✅ Error
   if (error) {
     return (
       <div className="text-red-500 text-center py-6">
         {error}
+        <button
+          onClick={() => refetch()}
+          className="ml-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Thử lại
+        </button>
       </div>
     );
   }
@@ -182,13 +171,16 @@ function ProductDetail() {
           ))}
         </div>
         <div className="p-6 flex-1">
-          <div className="flex items-center mb-2">
-            <h2 className="text-xl font-bold">{displayProduct.sanPham.tensp}</h2>
-            {hasPromotion && (
-              <span className="ml-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
-                Giảm {displayProduct.sanPham.khuyenMai.giaTriGiam}%
-              </span>
-            )}
+          <div className="flex items-center justify-between mb-2">
+            <div className="flex items-center">
+              <h2 className="text-xl font-bold">{displayProduct.sanPham.tensp}</h2>
+              {hasPromotion && (
+                <span className="ml-2 bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded">
+                  Giảm {displayProduct.sanPham.khuyenMai.giaTriGiam}%
+                </span>
+              )}
+            </div>
+            
           </div>
           {reviews && reviews.tongSoDanhGia > 0 && (
             <div className="flex items-center mb-4">
@@ -205,7 +197,9 @@ function ProductDetail() {
                   ))}
               </div>
               <span className="text-sm text-gray-600 mr-2">({reviews.diemTrungBinh.toFixed(1)})</span>
-              <span className="text-sm text-gray-600 cursor-pointer hover:underline" onClick={scrollToReviews}>| {reviews.tongSoDanhGia} đánh giá</span>
+              <span className="text-sm text-gray-600 cursor-pointer hover:underline" onClick={scrollToReviews}>
+                | {reviews.tongSoDanhGia} đánh giá
+              </span>
             </div>
           )}
           <div className="mb-4">
@@ -379,24 +373,24 @@ function ProductDetail() {
                       <img
                         key={imgIndex}
                         src={img}
-                        alt={`Product image ${imgIndex}`}
+                        alt={`Review image ${imgIndex}`}
                         className="h-25 object-cover rounded-lg cursor-pointer hover:opacity-80"
                         onClick={() => handleImageClick(img)}
                       />
                     ))}
                   </div>
                   <div className="flex space-x-2 mb-2">
-                    
-                      <img
-                        
-                        src={review.hinhAnhSanPham[0]}
-                        alt={review.tenSanPham}
-                        className="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80"
-                        onClick={() => handleImageClick(review.hinhAnhSanPham[0])}
-                      />
-                      <p className="pt-5 text-sm text-gray-500">Sản phẩm: {review.tenSanPham} - {review.mauSac}</p>
-
-                    
+                    {review.hinhAnhSanPham[0] && (
+                      <>
+                        <img
+                          src={review.hinhAnhSanPham[0]}
+                          alt={review.tenSanPham}
+                          className="w-16 h-16 object-cover rounded-lg cursor-pointer hover:opacity-80"
+                          onClick={() => handleImageClick(review.hinhAnhSanPham[0])}
+                        />
+                        <p className="pt-5 text-sm text-gray-500">Sản phẩm: {review.tenSanPham} - {review.mauSac}</p>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}
@@ -405,7 +399,6 @@ function ProductDetail() {
         </div>
       )}
 
-      {/* Popup hiển thị ảnh lớn */}
       {selectedImage && (
         <ImagePopup
           imageUrl={selectedImage}
