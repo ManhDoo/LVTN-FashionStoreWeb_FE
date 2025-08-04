@@ -12,7 +12,11 @@ const usePromotionProducts = () => {
     const fetchProducts = async () => {
       try {
         const res = await axios.get('/api/promotion/product');
-        setProducts(res.data);
+        // Lọc sản phẩm không bị xóa và không bị ẩn
+        const filteredProducts = res.data.filter(
+          (product) => !product.deleted
+        );
+        setProducts(filteredProducts);
       } catch (err) {
         setError('Lỗi khi tải sản phẩm khuyến mãi');
       } finally {
