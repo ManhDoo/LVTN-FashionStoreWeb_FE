@@ -58,22 +58,25 @@ const CartPage = () => {
   };
 
   const handleQuantityChange = (index, action) => {
-    const newQuantity = cart[index].quantity + (action === 'decrease' ? -1 : 1);
-    if (newQuantity > 0) {
-      updateQuantity(index, newQuantity);
-      const updatedCart = getCart().map(item => {
-        const currentDate = new Date();
-        const isPromotionValid = item.khuyenMai && new Date(item.khuyenMai.ngayKetThuc) > currentDate;
-        const price = item.price || 0;
-        const originalPrice = item.originalPrice || price;
-        return {
-          ...item,
-          displayPrice: isPromotionValid ? price : originalPrice,
-        };
-      });
-      setCart(updatedCart);
-    }
-  };
+  const newQuantity = cart[index].quantity + (action === 'decrease' ? -1 : 1);
+  const item = cart[index];
+
+  // Kiểm tra nếu số lượng mới hợp lệ
+  if (newQuantity > 0 && newQuantity <= item.stock) {
+    updateQuantity(index, newQuantity);
+    const updatedCart = getCart().map(item => {
+      const currentDate = new Date();
+      const isPromotionValid = item.khuyenMai && new Date(item.khuyenMai.ngayKetThuc) > currentDate;
+      const price = item.price || 0;
+      const originalPrice = item.originalPrice || price;
+      return {
+        ...item,
+        displayPrice: isPromotionValid ? price : originalPrice,
+      };
+    });
+    setCart(updatedCart);
+  }
+};
 
   const totalPrice = cart.reduce((sum, item) => sum + (item.displayPrice || 0) * item.quantity, 0);
   const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);

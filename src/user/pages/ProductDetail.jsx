@@ -43,9 +43,14 @@ function ProductDetail() {
   }, [selectedColor, selectedSize, products]);
 
   const handleQuantityChange = (action) => {
-    if (action === 'decrease' && quantity > 1) setQuantity(quantity - 1);
-    if (action === 'increase') setQuantity(quantity + 1);
-  };
+  if (action === 'decrease' && quantity > 1) {
+    setQuantity(quantity - 1);
+  }
+  if (action === 'increase' && selectedVariant && quantity < selectedVariant.tonKho) {
+    setQuantity(quantity + 1);
+  }
+};
+
 
   const scrollToReviews = () => {
     const reviewSection = document.querySelector('.review-section');
@@ -141,6 +146,7 @@ function ProductDetail() {
         quantity: quantity,
         color: selectedVariant.mauSac.tenMau,
         size: selectedVariant.kichCo.tenKichCo,
+        stock: selectedVariant.tonKho,
         price: finalPrice,
         originalPrice: originalPrice,
         khuyenMai: selectedVariant.sanPham.khuyenMai ? {
@@ -200,6 +206,7 @@ function ProductDetail() {
               <span className="text-sm text-gray-600 cursor-pointer hover:underline" onClick={scrollToReviews}>
                 | {reviews.tongSoDanhGia} đánh giá
               </span>
+              
             </div>
           )}
           <div className="mb-4">
@@ -218,6 +225,11 @@ function ProductDetail() {
               </p>
             )}
           </div>
+          {selectedVariant && (
+    <p className="text-sm text-gray-500 mt-1">
+      Kho: {selectedVariant.tonKho}
+    </p>
+  )}
           <div className="mb-4">
             <p className="font-semibold mb-2">Màu sắc:</p>
             <div className="flex space-x-2">
@@ -261,23 +273,26 @@ function ProductDetail() {
           </div>
           {variantError && <p className="text-red-500 mb-4">{variantError}</p>}
           <div className="mb-4">
-            <p className="font-semibold mb-2">Số lượng:</p>
-            <div className="flex items-center space-x-2">
-              <button
-                onClick={() => handleQuantityChange('decrease')}
-                className="px-3 py-1 border rounded"
-              >
-                -
-              </button>
-              <span className="px-4">{quantity}</span>
-              <button
-                onClick={() => handleQuantityChange('increase')}
-                className="px-3 py-1 border rounded"
-              >
-                +
-              </button>
-            </div>
-          </div>
+  <p className="font-semibold mb-2">Số lượng:</p>
+  <div className="flex items-center space-x-2">
+    <button
+      onClick={() => handleQuantityChange('decrease')}
+      className="px-3 py-1 border rounded"
+    >
+      -
+    </button>
+    <span className="px-4">{quantity}</span>
+    <button
+      onClick={() => handleQuantityChange('increase')}
+      className="px-3 py-1 border rounded"
+      disabled={selectedVariant && quantity >= selectedVariant.tonKho} // Chặn tăng quá tồn kho
+    >
+      +
+    </button>
+  </div>
+  
+</div>
+
           <button
             className={`cursor-pointer w-full py-2 mt-4 rounded text-white ${
               selectedVariant ? 'bg-black' : 'bg-gray-400 cursor-not-allowed'
