@@ -199,7 +199,7 @@ const OrderPage = () => {
                           <div className="text-sm text-gray-600 max-w-xs truncate">{order.diaChi}</div>
                         </td>
                         <td className="p-4">
-                          <div className="text-sm text-gray-600">{`0${order.soDienThoai}`}</div>
+                          <div className="text-sm text-gray-600">{order.soDienThoai}</div>
                         </td>
                         <td className="p-4">
                           <div className="text-sm text-gray-600">{new Date(order.ngayTao).toLocaleDateString()}</div>
