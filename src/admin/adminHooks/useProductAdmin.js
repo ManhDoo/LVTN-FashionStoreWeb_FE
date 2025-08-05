@@ -63,7 +63,7 @@ const useProductAdmin = () => {
   const deleteProduct = async (id) => {
     try {
       await axiosAdmin.delete(`/api/products/${id}`);
-      fetchProducts(page);
+      fetchProductsIsDeletd(page);
     } catch (err) {
       const errorMessage = err?.response?.data?.message || 'Lỗi khi xóa sản phẩm';
       alert(errorMessage);
